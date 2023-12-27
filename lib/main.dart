@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'login_screen.dart'; // Import your LoginScreen file here
+import 'login_screen.dart';
+import 'order_screen.dart'; // Import the OrderScreen file
 
 void main() {
   runApp(MyApp());
@@ -9,12 +10,17 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Login Demo',
+      title: 'eCrunchies',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.orange, // Choose a primary color swatch
+        //accentColor: Colors.orange, // Set accent color to orange
       ),
-      debugShowCheckedModeBanner: false,
-      home: LoginScreen(), // Set LoginScreen as the home
+      debugShowCheckedModeBanner: false, // Hide debug banner
+      initialRoute: '/',
+      routes: {
+        '/': (context) => LoginScreen(),
+        '/home': (context) => OrderScreen(),
+      },
     );
   }
 }
