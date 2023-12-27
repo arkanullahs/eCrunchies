@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'food_model.dart'; // Import your Food model here
+import 'food_details_screen.dart';
+import 'food_model.dart';
 
 class OrderScreen extends StatelessWidget {
   final List<Food> foods = [
@@ -27,13 +28,39 @@ class OrderScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Order Food'),
+        title: Text('Explore Restaurants'),
+        actions: [
+          GestureDetector(
+            onTap: () {
+              // Implement search functionality
+              print('Search button tapped!');
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Icon(
+                Icons.search,
+                size: 32,
+              ),
+            ),
+          ),
+          GestureDetector(
+            onTap: () {
+              Navigator.pushReplacementNamed(context, '/'); // Navigate to login screen
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Icon(
+                Icons.logout, // Use a logout icon here
+                size: 32,
+              ),
+            ),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Section 1: Carousel with Food Images
             SizedBox(height: 10),
             Container(
               height: 220,
@@ -42,7 +69,12 @@ class OrderScreen extends StatelessWidget {
                 itemBuilder: (BuildContext context, int index) {
                   return GestureDetector(
                     onTap: () {
-                      // Handle food item tap
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => FoodDetailsScreen(food: foods[index]),
+                        ),
+                      );
                     },
                     child: Card(
                       margin: EdgeInsets.symmetric(horizontal: 5),
@@ -63,7 +95,6 @@ class OrderScreen extends StatelessWidget {
                 },
               ),
             ),
-            // Section 2: Items
             SizedBox(height: 12),
             Padding(
               padding: const EdgeInsets.all(16.0),
@@ -83,7 +114,12 @@ class OrderScreen extends StatelessWidget {
                 itemBuilder: (context, index) {
                   return GestureDetector(
                     onTap: () {
-                      // Handle item tap
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => FoodDetailsScreen(food: foods[index]),
+                        ),
+                      );
                     },
                     child: Container(
                       width: 150,
@@ -104,8 +140,6 @@ class OrderScreen extends StatelessWidget {
                 },
               ),
             ),
-            // Section 3: Discover
-            SizedBox(height: 12),
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Text(
@@ -124,7 +158,12 @@ class OrderScreen extends StatelessWidget {
                 itemBuilder: (context, index) {
                   return GestureDetector(
                     onTap: () {
-                      // Handle restaurant tap
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => FoodDetailsScreen(food: foods[index]),
+                        ),
+                      );
                     },
                     child: Container(
                       width: 150,
@@ -148,4 +187,3 @@ class OrderScreen extends StatelessWidget {
     );
   }
 }
-
