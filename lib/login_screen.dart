@@ -1,4 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'signup_screen.dart'; // Import the SignupScreen file
+import 'order_screen.dart'; // Import the OrderScreen file
+import 'restaurant_dash.dart'; // Import the RestaurantDashboard file
+
+class UserType {
+  static const String user = 'User';
+  static const String restaurantOwner = 'Restaurant Owner';
+}
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -6,8 +15,9 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStateMixin {
-  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   bool _isLoginSuccessful = false;
   late AnimationController _animationController;
@@ -36,24 +46,23 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
     super.dispose();
   }
 
-  void _login() {
-    String username = _usernameController.text;
-    String password = _passwordController.text;
-
-    setState(() {
-      _isLoginSuccessful = false; // Reset the login status
-      _isPasswordIncorrect = false; // Reset the incorrect password status
-    });
-
-    // Simulate login success/failure
-    if (username == 'saad' && password == '123') {
+  void _login() async {
+    try {
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+        email: _emailController.text,
+        password: _passwordController.text,
+      );
       setState(() {
         _isLoginSuccessful = true;
       });
       _animationController.forward().then((value) {
-        Navigator.pushReplacementNamed(context, '/home');
+        if (_isRestaurantOwner()) {
+          Navigator.pushReplacementNamed(context, '/restaurantDashboard');
+        } else {
+          Navigator.pushReplacementNamed(context, '/orderScreen');
+        }
       });
-    } else {
+    } catch (e) {
       setState(() {
         _isPasswordIncorrect = true;
       });
@@ -61,6 +70,12 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
         _animationController.reverse();
       });
     }
+  }
+
+  bool _isRestaurantOwner() {
+    // Add your logic to determine if the logged-in user is a restaurant owner
+    // For example, you can check the user's type in Firebase
+    return false; // Replace with your logic
   }
 
   @override
@@ -82,12 +97,13 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                 ),
                 SizedBox(height: 32),
                 TextField(
-                  controller: _usernameController,
-                  onChanged: (_) => _updateButtonState(),
+                  controller: _emailController,
                   decoration: InputDecoration(
-                    labelText: 'Username',
-                    prefixIcon: Icon(Icons.person),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(20.0)),
+                    labelText: 'Email',
+                    prefixIcon: Icon(Icons.email),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
                   ),
                 ),
                 SizedBox(height: 16),
@@ -98,7 +114,9 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                   decoration: InputDecoration(
                     labelText: 'Password',
                     prefixIcon: Icon(Icons.lock),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(20.0)),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
                   ),
                 ),
                 SizedBox(height: 32),
@@ -125,11 +143,21 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                               ? Icon(Icons.close, color: Colors.white)
                               : (_isPasswordInputting
                               ? Icon(Icons.arrow_forward, color: Colors.white)
-                              : Icon(Icons.arrow_forward, color: Colors.white)), // Adjust the color here
+                              : Icon(Icons.arrow_forward, color: Colors.white)),
                         ),
                       );
                     },
                   ),
+                ),
+                SizedBox(height: 16),
+                TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => SignupScreen()),
+                    );
+                  },
+                  child: Text('Sign Up'),
                 ),
               ],
             ),

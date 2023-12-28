@@ -4,7 +4,7 @@ import 'dart:convert';
 class ServerHandler {
   Future<void> sendOrderData(Map<String, dynamic> orderData) async {
     final response = await http.post(
-      Uri.parse('http://192.168.0.112:3000/api/orders'),
+      Uri.parse('http://saadserver.eastasia.cloudapp.azure.com:3000/api/orders'),
       headers: <String, String>{
         'Content-Type': 'application/json',
       },
