@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "68254204410",
+    "project_id": "ecrunchies",
+    "storage_bucket": "ecrunchies.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:68254204410:android:726fa554da9c42d67f2443",
+        "android_client_info": {
+          "package_name": "com.example.ecrunchies"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBEPlNfSWOey7SKew_W4BEpSxSZawFJ3-w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:68254204410:android:198043e9c690862d7f2443",
+        "android_client_info": {
+          "package_name": "com.example.servertest"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBEPlNfSWOey7SKew_W4BEpSxSZawFJ3-w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

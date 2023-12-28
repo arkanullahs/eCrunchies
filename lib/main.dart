@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
-import 'login_screen.dart';
-import 'order_screen.dart'; // Import the OrderScreen file
+import 'package:firebase_core/firebase_core.dart';
 
-void main() {
+import 'firebase_options.dart';
+import 'login_screen.dart';
+import 'order_screen.dart';
+import 'restaurant_dash.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(MyApp());
 }
 
@@ -12,14 +20,15 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'eCrunchies',
       theme: ThemeData(
-        primarySwatch: Colors.orange, // Choose a primary color swatch
-        //accentColor: Colors.orange, // Set accent color to orange
+        primarySwatch: Colors.orange,
       ),
-      debugShowCheckedModeBanner: false, // Hide debug banner
+      debugShowCheckedModeBanner: false,
       initialRoute: '/',
       routes: {
         '/': (context) => LoginScreen(),
         '/home': (context) => OrderScreen(),
+        '/restaurantDashboard': (context) => RestaurantDashboard(),
+        '/orderScreen': (context) => OrderScreen(), // Add the OrderScreen route
       },
     );
   }
