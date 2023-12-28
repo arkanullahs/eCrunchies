@@ -18,7 +18,7 @@ eCrunchies is a food ordering and exploration app built using Flutter and Fireba
 ## Installation
 
 - Clone the repository:
-git clone https://github.com/your-username/eCrunchies.git
+git clone https://github.com/arkanullahs/eCrunchies.git
 - Set up Firebase:
 - Create a Firebase project at [Firebase Console](https://console.firebase.google.com/).
 - Add your Firebase configuration to the project by following the steps provided by Firebase.
