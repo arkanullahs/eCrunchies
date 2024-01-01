@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'login_screen.dart'; // Import the LoginScreen file
+import 'user_type.dart';
 
 class UserType {
   static const String user = 'User';
@@ -8,6 +9,10 @@ class UserType {
 }
 
 class SignupScreen extends StatefulWidget {
+  final String userType;
+
+  SignupScreen({required this.userType});
+
   @override
   _SignupScreenState createState() => _SignupScreenState();
 }
@@ -26,9 +31,9 @@ class _SignupScreenState extends State<SignupScreen> {
         password: _passwordController.text,
       );
       // If sign-up successful, navigate to the next screen based on the user type
-      if (_selectedUserType == UserType.user) {
+      if (widget.userType == UserType.user) {
         Navigator.pushReplacementNamed(context, '/orderScreen'); // Navigate to the user screen
-      } else if (_selectedUserType == UserType.restaurantOwner) {
+      } else if (widget.userType == UserType.restaurantOwner) {
         Navigator.pushReplacementNamed(context, '/restaurantDashboard'); // Navigate to the restaurant dashboard
       }
     } catch (e) {
@@ -126,7 +131,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => LoginScreen()),
+                      MaterialPageRoute(builder: (context) => LoginScreen(userType: '',)),
                     );
                   },
                   child: Text('Already have an account? Login'),
