@@ -1,7 +1,9 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'dart:async';
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'show_items.dart';
 
 class RestaurantDashboard extends StatefulWidget {
   @override
@@ -9,84 +11,199 @@ class RestaurantDashboard extends StatefulWidget {
 }
 
 class _RestaurantDashboardState extends State<RestaurantDashboard> {
-  List<dynamic> orders = []; // Store received orders
-  late Timer _timer; // Timer instance for periodic updates
+  late String imageUrl = '';
+  final picker = ImagePicker();
+  final nameController = TextEditingController();
+  final priceController = TextEditingController();
 
-  @override
-  void initState() {
-    super.initState();
-    fetchOrders(); // Fetch orders when the screen initializes
+  int itemCount = 0; // To maintain the count of items
 
-    // Start a periodic timer to update orders every 30 seconds
-    _timer = Timer.periodic(Duration(seconds: 3), (timer) {
-      fetchOrders();
+  Future<void> fetchItemCount() async {
+    QuerySnapshot<Map<String, dynamic>> querySnapshot =
+    await FirebaseFirestore.instance.collection('items').get();
+
+    setState(() {
+      itemCount = querySnapshot.docs.length;
     });
   }
 
   @override
-  void dispose() {
-    // Dispose the timer when the widget is disposed
-    _timer.cancel();
-    super.dispose();
+  void initState() {
+    super.initState();
+    fetchItemCount(); // Fetch the current item count on initialization
   }
 
-  Future<void> fetchOrders() async {
-    try {
-      // Make an HTTP GET request to fetch orders from the server
-      var response = await http.get(Uri.parse('http://saadserver.eastasia.cloudapp.azure.com:3000/api/orders'));
+  Future<void> addNewItem() async {
+    final pickedFile = await picker.getImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      String fileName = pickedFile.path.split('/').last;
+      String extension = fileName.split('.').last;
 
-      if (response.statusCode == 200) {
-        setState(() {
-          orders = json.decode(response.body); // Update orders list with fetched data
-        });
-      } else {
-        print('Failed to fetch orders');
-      }
-    } catch (error) {
-      print('Error fetching orders: $error');
+      firebase_storage.Reference ref = firebase_storage.FirebaseStorage.instance
+          .ref()
+          .child('items/$fileName');
+
+      await ref.putFile(new File(pickedFile.path));
+      imageUrl = await ref.getDownloadURL();
+
+      await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Enter Name and Price'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                TextField(
+                  controller: nameController,
+                  decoration: InputDecoration(labelText: 'Name'),
+                ),
+                TextField(
+                  controller: priceController,
+                  decoration: InputDecoration(labelText: 'Price'),
+                ),
+              ],
+            ),
+            actions: <Widget>[
+              ElevatedButton(
+                onPressed: () async {
+                  String name = nameController.text;
+                  String price = priceController.text;
+
+                  await FirebaseFirestore.instance.collection('items').doc('item_${itemCount + 1}').set({
+                    'name': name,
+                    'price': price,
+                    'imageUrl': imageUrl,
+                    'timestamp': FieldValue.serverTimestamp(),
+                  });
+
+                  setState(() {
+                    imageUrl = '';
+                  });
+
+                  nameController.clear();
+                  priceController.clear();
+
+                  await fetchItemCount(); // Update the itemCount after adding a new item
+
+                  Navigator.of(context).pop();
+                },
+                child: Text('Add'),
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      print('No image selected.');
     }
   }
 
   @override
+  void dispose() {
+    nameController.dispose();
+    priceController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Restaurant Dashboard'),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            ElevatedButton(
-              onPressed: fetchOrders, // Trigger the fetchOrders function on button press
-              child: Text('Update Orders'),
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('Restaurant Dashboard'),
+          bottom: TabBar(
+            tabs: [
+              Tab(text: 'Current Orders'),
+              Tab(text: 'Actions'),
+            ],
+          ),
+        ),
+        body: TabBarView(
+          children: [
+            // First Tab: Order Data
+            StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('orders')
+                  .orderBy('timeSent', descending: true)
+                  .snapshots(),
+              builder: (BuildContext context,
+                  AsyncSnapshot<QuerySnapshot> snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                }
+
+                final orderData = snapshot.data!.docs;
+
+                if (orderData.isEmpty) {
+                  return Center(child: Text('No orders available.'));
+                }
+
+                return ListView.builder(
+                  itemCount: orderData.length,
+                  itemBuilder: (context, index) {
+                    final foodName = orderData[index]['foodName'];
+                    final quantity = orderData[index]['quantity'];
+                    final price = orderData[index]['price'];
+                    final timeSent =
+                    (orderData[index]['timeSent'] as Timestamp)
+                        .toDate(); // Convert Timestamp to DateTime
+
+                    return ListTile(
+                      title: Text('Food: $foodName'),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Quantity: $quantity'),
+                          Text('Price: $price'),
+                          Text('Time Sent: ${_formatDateTime(timeSent)}'),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              },
             ),
-            SizedBox(height: 20),
-            Text(
-              'Received Orders:',
-              style: TextStyle(fontSize: 24),
-            ),
-            Expanded(
-              child: ListView.builder(
-                itemCount: orders.length,
-                itemBuilder: (context, index) {
-                  // Display orders in a list or other UI as needed
-                  return ListTile(
-                    title: Text('Food: ${orders[index]['foodName']}'),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Quantity: ${orders[index]['quantity']}'),
-                        Text('Price: \$${orders[index]['price']}'),
-                      ],
-                    ),
-                  );
-                },
+
+            // Second Tab: Buttons
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  ElevatedButton(
+                    onPressed: addNewItem,
+                    child: Text('Add New Item'),
+                  ),
+                  SizedBox(height: 20),
+                  imageUrl.isNotEmpty
+                      ? Image.network(
+                    imageUrl,
+                    height: 200,
+                    width: 200,
+                  )
+                      : Container(),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => ShowItems()),
+                      );
+                    },
+                    child: Text('Show Added Items'),
+                  ),
+                ],
               ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  String _formatDateTime(DateTime dateTime) {
+    // Format DateTime to a human-readable format
+    return '${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour}:${dateTime.minute}';
   }
 }
