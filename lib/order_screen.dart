@@ -56,16 +56,16 @@ class OrderScreen extends StatelessWidget {
               ),
             ),
             FoodItemsScreen(),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Text(
-                'Discover',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                ),
-              ),
-            ),
+            //Padding(
+              //padding: const EdgeInsets.all(16.0),
+              //child: Text(
+                //'Discover',
+               // style: TextStyle(
+                 // fontWeight: FontWeight.bold,
+                 // fontSize: 18,
+                //),
+              //),
+            //),
             DiscoverScreen(),
           ],
         ),
