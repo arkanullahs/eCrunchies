@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'food_model.dart';
-import 'server_handler.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FoodDetailsScreen extends StatefulWidget {
   final Food food;
-  final ServerHandler serverHandler = ServerHandler();
 
   FoodDetailsScreen({
     required this.food,
@@ -17,16 +16,24 @@ class FoodDetailsScreen extends StatefulWidget {
 class _FoodDetailsScreenState extends State<FoodDetailsScreen> {
   final TextEditingController _quantityController = TextEditingController();
   bool _isValid = true;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<void> sendOrderData(int quantity) async {
     Map<String, dynamic> orderData = {
       'foodName': widget.food.name,
       'price': widget.food.price,
       'quantity': quantity,
+      'timeSent': FieldValue.serverTimestamp(), // Include server timestamp
       // Add other order details as needed
     };
 
-    await widget.serverHandler.sendOrderData(orderData);
+    try {
+      await _firestore.collection('orders').add(orderData);
+      // Order data added successfully to Firestore
+    } catch (e) {
+      // Error handling, if needed
+      print('Error: $e');
+    }
   }
 
   @override
