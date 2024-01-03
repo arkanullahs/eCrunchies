@@ -5,10 +5,7 @@ import 'food_details_screen.dart';
 import 'food_model.dart';
 import 'FullRestaurantList.dart';
 
-import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'food_details_screen.dart';
-import 'food_model.dart';
+
 
 class DiscoverScreen extends StatelessWidget {
   @override
@@ -77,6 +74,7 @@ class LimitedRestaurantList extends StatelessWidget {
                             name: 'Sample Food',
                             price: 9.99,
                             image: imageUrl,
+                            description: 'Will Fix Description Later-Saad',
                           ),
                         ),
                       ),

@@ -66,15 +66,15 @@ class _FoodDetailsScreenState extends State<FoodDetailsScreen> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
                   image: DecorationImage(
-                    image: AssetImage(widget.food.image),
-                    fit: BoxFit.cover,
+                    image: NetworkImage(widget.food.image),
+                    fit: BoxFit.contain,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.grey.withOpacity(0.3),
-                      spreadRadius: 2,
-                      blurRadius: 5,
-                      offset: Offset(0, 3),
+                      color: Colors.grey.withOpacity(0.25),
+                      spreadRadius: 6,
+                      blurRadius: 50,
+                      offset: Offset(0, 8),
                     ),
                   ],
                 ),
@@ -97,7 +97,7 @@ class _FoodDetailsScreenState extends State<FoodDetailsScreen> {
                   borderRadius: BorderRadius.circular(15),
                 ),
                 child: Text(
-                  'Indulge in the tantalizing flavors of our Smokey Maple Bacon Bliss Burger. This culinary masterpiece features a juicy, flame-grilled beef patty topped with crispy maple-glazed bacon, smoky gouda cheese, and a dollop of zesty barbecue aioli. All sandwiched between a toasted brioche bun for the perfect blend of sweet, savory, and smoky sensations. Elevate your burger experience with this mouthwatering creation thats sure to leave you craving more.',
+                  widget.food.description,
                   style: TextStyle(fontSize: 16),
                 ),
               ),

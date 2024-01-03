@@ -51,6 +51,7 @@ class FoodsScreen extends StatelessWidget {
                                 name: name,
                                 price: price,
                                 image: imageUrl,
+                                description: 'Will Fix That Later-Saad',
                               ),
                             ),
                           ),

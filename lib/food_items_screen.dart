@@ -36,7 +36,9 @@ class FoodItemsScreen extends StatelessWidget {
                   itemBuilder: (context, index) {
                     final DocumentSnapshot document = documents[index];
                     final String name = document['name'];
+                    final double price = document['price'];
                     final String imageUrl = document['imageUrl'];
+                    final String description = document['description'];
 
                     return GestureDetector(
                       onTap: () {
@@ -47,8 +49,9 @@ class FoodItemsScreen extends StatelessWidget {
                               food: Food(
                                 restaurant: 'Sample Restaurant',
                                 name: name,
-                                price: 9.99, // Sample price
-                                image: imageUrl, // Use the fetched image URL here
+                                price: price, // Sample price
+                                image: imageUrl,
+                                description:description,// Use the fetched image URL here
                               ),
                             ),
                           ),
@@ -65,7 +68,11 @@ class FoodItemsScreen extends StatelessWidget {
                             fit: BoxFit.contain,
                           ),
                         ),
+
+
                       ),
+
+
                     );
                   },
                 );
