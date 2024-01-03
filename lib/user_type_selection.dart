@@ -15,14 +15,14 @@ class UserTypeSelection extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.asset(
-             'assets/login-icon/food_delivery_logo.png',
-               height: 170,
-               ),
+              'assets/login-icon/food_delivery_logo.png',
+              height: 170,
+            ),
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => signup.SignupScreen(userType: UserType.user)),
+                  MaterialPageRoute(builder: (context) => signup.SignupScreen(userType: '',)),
                 );
               },
               style: ElevatedButton.styleFrom(

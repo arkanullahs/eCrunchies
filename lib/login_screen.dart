@@ -38,7 +38,6 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
       ),
     );
   }
-
   @override
   void dispose() {
     _animationController.dispose();
@@ -213,33 +212,6 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
       );
     }
   }
-  /*
-  Widget _buildUserTypeSelection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Select User Type:'),
-        Row(
-          children: [
-            Radio(
-              value: UserType.user,
-              groupValue: _selectedUserType,
-              onChanged: _onUserTypeChanged,
-            ),
-            Text('User'),
-            SizedBox(width: 20),
-            Radio(
-              value: UserType.restaurantOwner,
-              groupValue: _selectedUserType,
-              onChanged: _onUserTypeChanged,
-            ),
-            Text('Restaurant Owner'),
-          ],
-        ),
-      ],
-    );
-  }
-  */
 
   @override
   Widget build(BuildContext context) {
@@ -280,6 +252,36 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20.0),
                     ),
+                  ),
+                ),
+                SizedBox(height: 32),
+                GestureDetector(
+                  onTap: _isPasswordIncorrect ? null : _login,
+                  child: AnimatedBuilder(
+                    animation: _animationController,
+                    builder: (context, child) {
+                      return Container(
+                        width: double.infinity,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(_animation.value),
+                          color: _isLoginSuccessful
+                              ? Colors.green
+                              : _isPasswordIncorrect
+                              ? Colors.red
+                              : (_isPasswordInputting ? Theme.of(context).primaryColor : Colors.grey),
+                        ),
+                        child: Center(
+                          child: _isLoginSuccessful
+                              ? Icon(Icons.check, color: Colors.white)
+                              : _isPasswordIncorrect
+                              ? Icon(Icons.close, color: Colors.white)
+                              : (_isPasswordInputting
+                              ? Icon(Icons.arrow_forward, color: Colors.white)
+                              : Icon(Icons.arrow_forward, color: Colors.white)),
+                        ),
+                      );
+                    },
                   ),
                 ),
                 SizedBox(height: 16),
