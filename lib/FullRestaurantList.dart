@@ -51,9 +51,10 @@ class FullRestaurantListScreen extends StatelessWidget {
                     builder: (context) => FoodDetailsScreen(
                       food: Food(
                         restaurant: name,
-                        name: 'Sample Food',
-                        price: 9.99,
+                        name: 'Will Fix Description Later-Saad',
+                        price: 0,
                         image: imageUrl,
+                        description: 'Will Fix Description Later-Saad',
                       ),
                     ),
                   ),
