@@ -256,7 +256,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
               children: [
                 Image.asset(
                   'assets/login-icon/food_delivery_logo.png',
-                  height: 120,
+                  height: 170,
                 ),
                 SizedBox(height: 32),
                 TextField(

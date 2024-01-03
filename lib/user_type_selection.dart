@@ -14,6 +14,10 @@ class UserTypeSelection extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Image.asset(
+             'assets/login-icon/food_delivery_logo.png',
+               height: 170,
+               ),
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
