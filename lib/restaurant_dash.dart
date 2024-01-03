@@ -15,6 +15,7 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
   final picker = ImagePicker();
   final nameController = TextEditingController();
   final priceController = TextEditingController();
+  final descriptionController=TextEditingController();
 
   int itemCount = 0; // To maintain the count of items
 
@@ -37,7 +38,6 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
     final pickedFile = await picker.getImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       String fileName = pickedFile.path.split('/').last;
-      String extension = fileName.split('.').last;
 
       firebase_storage.Reference ref = firebase_storage.FirebaseStorage.instance
           .ref()
@@ -50,7 +50,7 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Enter Name and Price'),
+            title: Text('Enter Name, Price, and Description'),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
@@ -60,7 +60,12 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
                 ),
                 TextField(
                   controller: priceController,
+                  keyboardType: TextInputType.number,
                   decoration: InputDecoration(labelText: 'Price'),
+                ),
+                TextField(
+                  controller: descriptionController,
+                  decoration: InputDecoration(labelText: 'Description'),
                 ),
               ],
             ),
@@ -68,9 +73,12 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
               ElevatedButton(
                 onPressed: () async {
                   String name = nameController.text;
-                  String price = priceController.text;
+                  double price = double.tryParse(priceController.text) ?? 0.0;
+                  String description = descriptionController.text;
 
-                  await FirebaseFirestore.instance.collection('items').doc('item_${itemCount + 1}').set({
+                  // Add a new document without passing a document ID
+                  await FirebaseFirestore.instance.collection('items').add({
+                    'description': description,
                     'name': name,
                     'price': price,
                     'imageUrl': imageUrl,
@@ -83,10 +91,11 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
 
                   nameController.clear();
                   priceController.clear();
+                  descriptionController.clear();
 
                   await fetchItemCount(); // Update the itemCount after adding a new item
 
-                  Navigator.of(context).pop();
+                  Navigator.of(context).pop(); // Dismiss the dialog after adding the item
                 },
                 child: Text('Add'),
               ),
@@ -99,10 +108,13 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
     }
   }
 
+
+
   @override
   void dispose() {
     nameController.dispose();
     priceController.dispose();
+    descriptionController.dispose();
     super.dispose();
   }
 
