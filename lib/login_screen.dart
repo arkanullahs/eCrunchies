@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'signup_screen.dart'; // Import the SignupScreen file
-import 'order_screen.dart'; // Import the OrderScreen file
-import 'restaurant_dash.dart'; // Import the RestaurantDashboard file
-
-class UserType {
-  static const String user = 'User';
-  static const String restaurantOwner = 'Restaurant Owner';
-}
+import 'signup_screen.dart';
+import 'user_type.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class LoginScreen extends StatefulWidget {
+  final String userType;
+
+  LoginScreen({required this.userType});
+
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStateMixin {
+class _LoginScreenState extends State<LoginScreen>
+    with SingleTickerProviderStateMixin {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -48,7 +49,8 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
 
   void _login() async {
     try {
-      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+      UserCredential userCredential =
+      await _auth.signInWithEmailAndPassword(
         email: _emailController.text,
         password: _passwordController.text,
       );
@@ -63,6 +65,15 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
         }
       });
     } catch (e) {
+      // login errors dekhabe
+      print('Login failed: $e');
+      // display error
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Login failed. Please check your credentials.'),
+          duration: Duration(seconds: 3),
+        ),
+      );
       setState(() {
         _isPasswordIncorrect = true;
       });
@@ -73,9 +84,134 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
   }
 
   bool _isRestaurantOwner() {
-    // Add your logic to determine if the logged-in user is a restaurant owner
-    // For example, you can check the user's type in Firebase
-    return false; // Replace with your logic
+
+    return false;
+  }
+
+  // Method -> "Forgot Password"
+  Future<void> _showForgotPasswordDialog() async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Forgot Password'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('Enter your email to receive a password reset link.'),
+                TextField(
+                  controller: _emailController,
+                  decoration: InputDecoration(
+                    labelText: 'Email',
+                    prefixIcon: Icon(Icons.email),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                _sendPasswordResetEmail();
+                Navigator.of(context).pop();
+              },
+              child: Text('Reset Password'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Method -> send  password reset email
+  void _sendPasswordResetEmail() async {
+    try {
+      await _auth.sendPasswordResetEmail(email: _emailController.text);
+
+      // Display  message
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Password Reset Email Sent'),
+            content: Text('Check your email for a password reset link.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+
+      print('Password reset email sent successfully');
+    } catch (e) {
+      // Handle errors-> user not found
+      print('Error sending password reset email: $e');
+
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Error'),
+            content: Text('Error sending password reset email. Please try again.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+  /*
+  Widget _buildUserTypeSelection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Select User Type:'),
+        Row(
+          children: [
+            Radio(
+              value: UserType.user,
+              groupValue: _selectedUserType,
+              onChanged: _onUserTypeChanged,
+            ),
+            Text('User'),
+            SizedBox(width: 20),
+            Radio(
+              value: UserType.restaurantOwner,
+              groupValue: _selectedUserType,
+              onChanged: _onUserTypeChanged,
+            ),
+            Text('Restaurant Owner'),
+          ],
+        ),
+      ],
+    );
+  }
+  */
+  void _updateButtonState() {
+    setState(() {
+      _isPasswordInputting = _passwordController.text.isNotEmpty;
+      _isPasswordIncorrect = false;
+    });
   }
 
   @override
@@ -152,9 +288,16 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                 SizedBox(height: 16),
                 TextButton(
                   onPressed: () {
+                    _showForgotPasswordDialog(); // Show the "Forgot Password" dialog
+                  },
+                  child: Text('Forgot Password?'),
+                ),
+                SizedBox(height: 16),
+                TextButton(
+                  onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => SignupScreen()),
+                      MaterialPageRoute(builder: (context) => SignupScreen(userType: widget.userType)),
                     );
                   },
                   child: Text('Sign Up'),
@@ -166,11 +309,9 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
       ),
     );
   }
+}
 
-  void _updateButtonState() {
-    setState(() {
-      _isPasswordInputting = _passwordController.text.isNotEmpty;
-      _isPasswordIncorrect = false;
-    });
-  }
+bool _isRestaurantOwner() {
+
+  return false;
 }
