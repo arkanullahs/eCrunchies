@@ -4,7 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'login_screen.dart';
 import 'order_screen.dart';
-//import 'restaurant_dashboard.dart';
+import 'restaurant_dash.dart';
 import 'user_type_selection.dart';
 import 'signup_screen.dart';
 
@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => UserTypeSelection(),
         '/home': (context) => OrderScreen(),
-        // '/restaurantDashboard': (context) => RestaurantDashboard(),
+        '/restaurantDashboard': (context) => RestaurantDashboard(),
         '/orderScreen': (context) => OrderScreen(),
         '/login': (context) => LoginScreen(userType: ''),
         '/signup': (context) => SignupScreen(userType: ''),
