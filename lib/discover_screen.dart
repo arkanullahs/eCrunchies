@@ -7,6 +7,7 @@ import 'FullRestaurantList.dart';
 
 
 
+
 class DiscoverScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {

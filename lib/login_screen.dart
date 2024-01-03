@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'signup_screen.dart'; // Import the SignupScreen file
-import 'order_screen.dart'; // Import the OrderScreen file
-import 'restaurant_dash.dart'; // Import the RestaurantDashboard file
-
-class UserType {
-  static const String user = 'User';
-  static const String restaurantOwner = 'Restaurant Owner';
-}
+import 'signup_screen.dart' as signup;
+import 'user_type.dart' as userType;
 
 class LoginScreen extends StatefulWidget {
+  final String userType;
+
+  LoginScreen({required this.userType});
+
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
@@ -18,12 +16,13 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  String _selectedUserType = userType.UserType.user;
 
-  bool _isLoginSuccessful = false;
-  late AnimationController _animationController;
-  late Animation<double> _animation;
   bool _isPasswordInputting = false;
   bool _isPasswordIncorrect = false;
+  late AnimationController _animationController;
+  late Animation<double> _animation;
+  bool _isLoginSuccessful = false;
 
   @override
   void initState() {
@@ -39,11 +38,49 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
       ),
     );
   }
-
   @override
   void dispose() {
     _animationController.dispose();
     super.dispose();
+  }
+
+  Widget _buildUserTypeSelection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Select User Type:'),
+        Row(
+          children: [
+            Radio(
+              value: userType.UserType.user,
+              groupValue: _selectedUserType,
+              onChanged: _onUserTypeChanged,
+            ),
+            Text('User'),
+            SizedBox(width: 20),
+            Radio(
+              value: userType.UserType.restaurantOwner,
+              groupValue: _selectedUserType,
+              onChanged: _onUserTypeChanged,
+            ),
+            Text('Restaurant Owner'),
+          ],
+        ),
+      ],
+    );
+  }
+
+  void _onUserTypeChanged(String? value) {
+    setState(() {
+      _selectedUserType = value ?? userType.UserType.user;
+    });
+  }
+
+  void _updateButtonState() {
+    setState(() {
+      _isPasswordInputting = _passwordController.text.isNotEmpty;
+      _isPasswordIncorrect = false;
+    });
   }
 
   void _login() async {
@@ -52,6 +89,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
         email: _emailController.text,
         password: _passwordController.text,
       );
+
       setState(() {
         _isLoginSuccessful = true;
       });
@@ -63,6 +101,13 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
         }
       });
     } catch (e) {
+      print('Login failed: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Login failed. Please check your credentials.'),
+          duration: Duration(seconds: 3),
+        ),
+      );
       setState(() {
         _isPasswordIncorrect = true;
       });
@@ -73,9 +118,99 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
   }
 
   bool _isRestaurantOwner() {
-    // Add your logic to determine if the logged-in user is a restaurant owner
-    // For example, you can check the user's type in Firebase
-    return false; // Replace with your logic
+    return _selectedUserType == userType.UserType.restaurantOwner;
+  }
+
+  // Method -> Forgot Password
+  Future<void> _showForgotPasswordDialog() async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Forgot Password'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('Enter your email to receive a password reset link.'),
+                TextField(
+                  controller: _emailController,
+                  decoration: InputDecoration(
+                    labelText: 'Email',
+                    prefixIcon: Icon(Icons.email),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                _sendPasswordResetEmail();
+                Navigator.of(context).pop();
+              },
+              child: Text('Reset Password'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Method-> password reset email
+  void _sendPasswordResetEmail() async {
+    try {
+      await _auth.sendPasswordResetEmail(email: _emailController.text);
+
+      // Display a message
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Password Reset Email Sent'),
+            content: Text('Check your email for a password reset link.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+
+      print('Password reset email sent successfully');
+    } catch (e) {
+      print('Error sending password reset email: $e');
+
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Error'),
+            content: Text('Error sending password reset email. Please try again.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 
   @override
@@ -93,7 +228,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
               children: [
                 Image.asset(
                   'assets/login-icon/food_delivery_logo.png',
-                  height: 120,
+                  height: 170,
                 ),
                 SizedBox(height: 32),
                 TextField(
@@ -150,12 +285,23 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                   ),
                 ),
                 SizedBox(height: 16),
+                _buildUserTypeSelection(),
+                SizedBox(height: 32),
+                ElevatedButton(
+                  onPressed: _login,
+                  child: Text('Login'),
+                ),
+                SizedBox(height: 16),
                 TextButton(
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => SignupScreen()),
-                    );
+                    _showForgotPasswordDialog();
+                  },
+                  child: Text('Forgot Password?'),
+                ),
+                SizedBox(height: 16),
+                TextButton(
+                  onPressed: () {
+                    _goToSignupScreen();
                   },
                   child: Text('Sign Up'),
                 ),
@@ -166,11 +312,10 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
       ),
     );
   }
-
-  void _updateButtonState() {
-    setState(() {
-      _isPasswordInputting = _passwordController.text.isNotEmpty;
-      _isPasswordIncorrect = false;
-    });
+  void _goToSignupScreen() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => signup.SignupScreen(userType: _selectedUserType)),
+    );
   }
 }
