@@ -3,19 +3,23 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'show_items.dart';
+import 'restaurant_dash_show_items.dart';
+import 'restaurant_dash_show_order_list.dart';
+
 
 class RestaurantDashboard extends StatefulWidget {
   @override
   _RestaurantDashboardState createState() => _RestaurantDashboardState();
 }
 
+
 class _RestaurantDashboardState extends State<RestaurantDashboard> {
+  final ShowOrder _showOrder = ShowOrder();
   late String imageUrl = '';
   final picker = ImagePicker();
   final nameController = TextEditingController();
   final priceController = TextEditingController();
-  final descriptionController=TextEditingController();
+  final descriptionController = TextEditingController();
 
   int itemCount = 0; // To maintain the count of items
 
@@ -73,7 +77,8 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
               ElevatedButton(
                 onPressed: () async {
                   String name = nameController.text;
-                  double price = double.tryParse(priceController.text) ?? 0.0;
+                  double price =
+                      double.tryParse(priceController.text) ?? 0.0;
                   String description = descriptionController.text;
 
                   // Add a new document without passing a document ID
@@ -98,6 +103,13 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
                   Navigator.of(context).pop(); // Dismiss the dialog after adding the item
                 },
                 child: Text('Add'),
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.deepOrangeAccent,
+                  elevation: 5,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
               ),
             ],
           );
@@ -107,8 +119,6 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
       print('No image selected.');
     }
   }
-
-
 
   @override
   void dispose() {
@@ -120,102 +130,52 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text('Restaurant Dashboard'),
-          bottom: TabBar(
-            tabs: [
-              Tab(text: 'Current Orders'),
-              Tab(text: 'Actions'),
-            ],
-          ),
-        ),
-        body: TabBarView(
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Restaurant Dashboard'),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          addNewItem();
+          // Implement action for adding new items
+          // For example:
+          // Navigator.push(context, MaterialPageRoute(builder: (context) => AddNewItemScreen()));
+        },
+        tooltip: 'Add New Item',
+        child: Icon(Icons.add),
+      ),
+      body: Center(
+        child: Text('Your Dashboard Content Here'),
+      ),
+      bottomNavigationBar: BottomAppBar(
+        shape: CircularNotchedRectangle(),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            // First Tab: Order Data
-            StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance
-                  .collection('orders')
-                  .orderBy('timeSent', descending: true)
-                  .snapshots(),
-              builder: (BuildContext context,
-                  AsyncSnapshot<QuerySnapshot> snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                }
-
-                final orderData = snapshot.data!.docs;
-
-                if (orderData.isEmpty) {
-                  return Center(child: Text('No orders available.'));
-                }
-
-                return ListView.builder(
-                  itemCount: orderData.length,
-                  itemBuilder: (context, index) {
-                    final foodName = orderData[index]['foodName'];
-                    final quantity = orderData[index]['quantity'];
-                    final price = orderData[index]['price'];
-                    final timeSent =
-                    (orderData[index]['timeSent'] as Timestamp)
-                        .toDate(); // Convert Timestamp to DateTime
-
-                    return ListTile(
-                      title: Text('Food: $foodName'),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Quantity: $quantity'),
-                          Text('Price: $price'),
-                          Text('Time Sent: ${_formatDateTime(timeSent)}'),
-                        ],
-                      ),
-                    );
-                  },
-                );
+            IconButton(
+              icon: Icon(Icons.show_chart_outlined),
+              onPressed: () {Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ShowOrder().buildOrderList(context),
+                ),
+              );
               },
             ),
-
-            // Second Tab: Buttons
-            Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  ElevatedButton(
-                    onPressed: addNewItem,
-                    child: Text('Add New Item'),
-                  ),
-                  SizedBox(height: 20),
-                  imageUrl.isNotEmpty
-                      ? Image.network(
-                    imageUrl,
-                    height: 200,
-                    width: 200,
-                  )
-                      : Container(),
-                  SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => ShowItems()),
-                      );
-                    },
-                    child: Text('Show Added Items'),
-                  ),
-                ],
-              ),
+            IconButton(
+              icon: Icon(Icons.list),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ShowItems()),
+                );
+              },
             ),
           ],
         ),
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
-
-  String _formatDateTime(DateTime dateTime) {
-    // Format DateTime to a human-readable format
-    return '${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour}:${dateTime.minute}';
-  }
 }
+
