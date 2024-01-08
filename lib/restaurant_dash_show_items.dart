@@ -98,6 +98,10 @@ class ShowItems extends StatelessWidget {
                                   },
                                 );
                               },
+                              style: TextButton.styleFrom(
+                                minimumSize: Size.zero, // Set this
+                                padding: EdgeInsets.zero, // and this
+                              ),
                               child: Text('Read more'),
 
                             ),
@@ -165,7 +169,7 @@ class EditItemPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final nameController = TextEditingController(text: item['name']);
-    final priceController = TextEditingController(text: item['price'].toString());
+    final priceController = TextEditingController();
     final imageUrlController = TextEditingController(text: item['imageUrl']);
     final descriptionController = TextEditingController(text: item['description']);
 
@@ -215,7 +219,7 @@ class EditItemPage extends StatelessWidget {
                     .update({
                   'name': nameController.text,
                   'description': descriptionController.text,
-                  'price': priceController.text,
+                  'price': double.tryParse(priceController.text) ?? 0.0,
                   'imageUrl': imageUrlController.text,
                 });
 
