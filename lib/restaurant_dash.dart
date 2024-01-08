@@ -1,4 +1,3 @@
-
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
@@ -21,6 +20,9 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
   final nameController = TextEditingController();
   final priceController = TextEditingController();
   final descriptionController = TextEditingController();
+  final nameController2 = TextEditingController();
+  final priceController2 = TextEditingController();
+  final descriptionController2 = TextEditingController();
   int val=0;
 
   int itemCount = 0; // To maintain the count of items
@@ -122,6 +124,7 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
     }
   }
 
+
   @override
   void dispose() {
     nameController.dispose();
@@ -129,6 +132,8 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
     descriptionController.dispose();
     super.dispose();
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -151,9 +156,10 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
       SpeedDialChild(
       child: Icon(Icons.local_offer_outlined),
       label: 'Add Offer',
-      onTap: (){
-        //addoffer
-      }  ),
+          onTap: () async {
+            //await addNewOffer();
+
+          }  ),
         ],
       ),
 
