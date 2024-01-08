@@ -30,6 +30,7 @@ class MyApp extends StatelessWidget {
       title: 'eCrunchies',
       theme: ThemeData(
         primarySwatch: Colors.orange,
+
       ),
       debugShowCheckedModeBanner: false,
       initialRoute: '/',

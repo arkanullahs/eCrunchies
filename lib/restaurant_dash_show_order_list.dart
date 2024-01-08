@@ -5,14 +5,21 @@ class ShowOrder {
   Widget buildOrderList(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Order List'),
+        backgroundColor: Colors.white,
+        title: Text(
+          'Order List',
+          style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'SF Pro Display'),
+        ),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection('orders')
             .orderBy('timeSent', descending: true)
             .snapshots(),
-        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
           }
@@ -20,7 +27,15 @@ class ShowOrder {
           final orderData = snapshot.data!.docs;
 
           if (orderData.isEmpty) {
-            return Center(child: Text('No orders available.'));
+            return Center(
+              child: Text(
+                'No orders available.',
+                style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'SF Pro Display'),
+              ),
+            );
           }
 
           return ListView.builder(
@@ -32,15 +47,40 @@ class ShowOrder {
               final timeSent =
               (orderData[index]['timeSent'] as Timestamp).toDate();
 
-              return ListTile(
-                title: Text('Food: $foodName'),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Quantity: $quantity'),
-                    Text('Price: $price'),
-                    Text('Time Sent: ${_formatDateTime(timeSent)}'),
-                  ],
+              return Card(
+                elevation: 5,
+                margin: EdgeInsets.all(10),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: ListTile(
+                  title: Text(
+                    'Food: $foodName',
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'SF Pro Display'),
+                  ),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Quantity: $quantity',
+                        style: TextStyle(
+                            fontSize: 16, fontFamily: 'SF Pro Display'),
+                      ),
+                      Text(
+                        'Price: $price',
+                        style: TextStyle(
+                            fontSize: 16, fontFamily: 'SF Pro Display'),
+                      ),
+                      Text(
+                        'Time Sent: ${_formatDateTime(timeSent)}',
+                        style: TextStyle(
+                            fontSize: 16, fontFamily: 'SF Pro Display'),
+                      ),
+                    ],
+                  ),
                 ),
               );
             },
