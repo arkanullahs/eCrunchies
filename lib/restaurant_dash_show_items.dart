@@ -65,7 +65,11 @@ class ShowItems extends StatelessWidget {
                         ),
                         title: Text(
                           items[index]['name'],
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              fontStyle: FontStyle.italic,
+                          ),
                         ),
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -75,7 +79,7 @@ class ShowItems extends StatelessWidget {
                               items[index]['description'],
                               style: TextStyle(fontSize: 14,fontStyle:FontStyle.italic),
                               maxLines: 3,
-                              overflow: TextOverflow.fade,
+                              overflow: TextOverflow.ellipsis,
                             ),
                             TextButton(
                               onPressed: () {
@@ -129,7 +133,7 @@ class ShowItems extends StatelessWidget {
                                 );
                               },
                               icon: Icon(Icons.edit),
-                              color: Colors.blue,
+                              color: Colors.grey,
                             ),
                           ],
                         ),

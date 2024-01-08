@@ -1,17 +1,18 @@
+
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'restaurant_dash_show_items.dart';
 import 'restaurant_dash_show_order_list.dart';
-
+//import 'add_offer_page.dart'; // Import the AddOfferPage
 
 class RestaurantDashboard extends StatefulWidget {
   @override
   _RestaurantDashboardState createState() => _RestaurantDashboardState();
 }
-
 
 class _RestaurantDashboardState extends State<RestaurantDashboard> {
   final ShowOrder _showOrder = ShowOrder();
@@ -20,6 +21,7 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
   final nameController = TextEditingController();
   final priceController = TextEditingController();
   final descriptionController = TextEditingController();
+  int val=0;
 
   int itemCount = 0; // To maintain the count of items
 
@@ -134,16 +136,28 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
       appBar: AppBar(
         title: Text('Restaurant Dashboard'),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          addNewItem();
-          // Implement action for adding new items
-          // For example:
-          // Navigator.push(context, MaterialPageRoute(builder: (context) => AddNewItemScreen()));
-        },
-        tooltip: 'Add New Item',
-        child: Icon(Icons.add),
+      floatingActionButton: SpeedDial(
+        // Replaces the FloatingActionButton with a PopupMenuButton
+        //icon: Icons.add,
+        animatedIcon: AnimatedIcons.menu_arrow,
+        children: [
+      SpeedDialChild(
+      child: Icon(Icons.add_circle_outline),
+      label: 'Add New Item',
+      onTap: () async {
+        await addNewItem();
+
+      } ),
+      SpeedDialChild(
+      child: Icon(Icons.local_offer_outlined),
+      label: 'Add Offer',
+      onTap: (){
+        //addoffer
+      }  ),
+        ],
       ),
+
+
       body: Center(
         child: Text('Your Dashboard Content Here'),
       ),
@@ -154,16 +168,17 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
           children: [
             IconButton(
               icon: Icon(Icons.show_chart_outlined),
-              onPressed: () {Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ShowOrder().buildOrderList(context),
-                ),
-              );
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ShowOrder().buildOrderList(context),
+                  ),
+                );
               },
             ),
             IconButton(
-              icon: Icon(Icons.list),
+              icon: Icon(Icons.checklist),
               onPressed: () {
                 Navigator.push(
                   context,
