@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'food_details_screen.dart';
 import 'food_model.dart';
 import 'discover_screen.dart';
+import 'restaurant_menu_screen.dart';
 
 class FullRestaurantList extends StatelessWidget {
   @override
@@ -36,37 +37,29 @@ class FullRestaurantListScreen extends StatelessWidget {
 
         final List<DocumentSnapshot> documents = snapshot.data!.docs;
 
-        return ListView.builder(
-          itemCount: documents.length,
-          itemBuilder: (context, index) {
-            final DocumentSnapshot document = documents[index];
-            final String name = document['name'];
-            final String imageUrl = document['imageUrl'];
+      return ListView.builder(
+        itemCount: documents.length,
+        itemBuilder: (context, index) {
+          final DocumentSnapshot document = documents[index];
+          final String name = document['name'];
+          final String imageUrl = document['imageUrl'];
 
-            return GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => FoodDetailsScreen(
-                      food: Food(
-                        restaurant: name,
-                        name: 'Will Fix Description Later-Saad',
-                        price: 0,
-                        image: imageUrl,
-                        description: 'Will Fix Description Later-Saad',
-                      ),
-                    ),
-                  ),
-                );
-              },
-              child: RestaurantCard(
-                imageUrl: imageUrl,
-                name: name,
-              ),
-            );
-          },
-        );
+          return GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => RestaurantMenuScreen(restaurantName: name),
+                ),
+              );
+            },
+            child: RestaurantCard(
+              imageUrl: imageUrl,
+              name: name,
+            ),
+          );
+        },
+      );
       },
     );
   }
