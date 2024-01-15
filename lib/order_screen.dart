@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'food_details_screen.dart';
@@ -6,8 +5,14 @@ import 'food_items_screen.dart';
 import 'discover_screen.dart';
 import 'foods_screen.dart';
 import 'restaurant_menu_screen.dart';
+import 'chat_screen.dart'; // Import the chat screen
 
 class OrderScreen extends StatefulWidget {
+  // Add the restaurantOwnerId parameter to pass to the ChatScreen
+  final String restaurantOwnerId;
+
+  OrderScreen({required this.restaurantOwnerId});
+
   @override
   _OrderScreenState createState() => _OrderScreenState();
 }
@@ -55,6 +60,21 @@ class _OrderScreenState extends State<OrderScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(height: 10),
+          /////////////////  //  a button to place an order
+          /*  ElevatedButton(
+              onPressed: () {
+                // Perform order logic
+
+                // Now, navigate to the ChatScreen after placing the order
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ChatScreen(restaurantOwnerId: widget.restaurantOwnerId),
+                  ),
+                );
+              },
+             // child: Text('Place Order'),
+            ),*/
             FoodsScreen(), // Food page view
             SizedBox(height: 12),
             Padding(
@@ -69,6 +89,19 @@ class _OrderScreenState extends State<OrderScreen> {
             ),
             FoodItemsScreen(),
             DiscoverScreen(),
+            SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                // Replace 'restaurantOwnerId' with the actual ID of the restaurant owner
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ChatScreen(restaurantOwnerId: 'restaurantOwnerId'),
+                  ),
+                );
+              },
+              child: Text('Chat with Restaurant Owner'),
+            ),
           ],
         ),
       ),
@@ -164,7 +197,6 @@ class SearchResults extends StatelessWidget {
     );
   }
 }
-
 class RestaurantCard extends StatelessWidget {
   final String imageUrl;
   final String name;

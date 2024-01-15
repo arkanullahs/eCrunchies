@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'chat_screen.dart';
 import 'food_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -23,15 +24,12 @@ class _FoodDetailsScreenState extends State<FoodDetailsScreen> {
       'foodName': widget.food.name,
       'price': widget.food.price,
       'quantity': quantity,
-      'timeSent': FieldValue.serverTimestamp(), // Include server timestamp
-      // Add other order details as needed
+      'timeSent': FieldValue.serverTimestamp(),
     };
 
     try {
       await _firestore.collection('orders').add(orderData);
-      // Order data added successfully to Firestore
     } catch (e) {
-      // Error handling, if needed
       print('Error: $e');
     }
   }
@@ -44,13 +42,6 @@ class _FoodDetailsScreenState extends State<FoodDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    List<String> restaurantImages = [
-      'assets/restaurant_0.png', // Restaurant 0 image
-      'assets/restaurant_1.png', // Restaurant 1 image
-      'assets/restaurant_2.png', // Restaurant 2 image
-      // Add more restaurant images here as needed
-    ];
-
     return Scaffold(
       appBar: AppBar(
         title: Text('Order ${widget.food.name}'),
@@ -143,6 +134,13 @@ class _FoodDetailsScreenState extends State<FoodDetailsScreen> {
                       ? () {
                     int quantity = int.tryParse(_quantityController.text) ?? 0;
                     sendOrderData(quantity);
+                    // **************************************************Uncomment the following lines if you want to navigate to ChatScreen
+                     Navigator.push(
+                       context,
+                       MaterialPageRoute(
+                         builder: (context) => ChatScreen(restaurantOwnerId: 'yourActualRestaurantOwnerId'),
+                       ),
+                     );
                   }
                       : null,
                   style: ElevatedButton.styleFrom(

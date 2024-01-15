@@ -30,18 +30,18 @@ class MyApp extends StatelessWidget {
       title: 'eCrunchies',
       theme: ThemeData(
         primarySwatch: Colors.orange,
-
       ),
       debugShowCheckedModeBanner: false,
       initialRoute: '/',
       routes: {
         '/': (context) => UserTypeSelection(),
-        '/home': (context) => OrderScreen(),
+        '/home': (context) => OrderScreen(restaurantOwnerId: '',), // No need to pass restaurantOwnerId here
         '/restaurantDashboard': (context) => RestaurantDashboard(),
-        '/orderScreen': (context) => OrderScreen(),
+        '/orderScreen': (context) => OrderScreen(restaurantOwnerId: '',), // No need to pass restaurantOwnerId here
         '/login': (context) => LoginScreen(userType: ''),
         '/signup': (context) => SignupScreen(userType: ''),
       },
     );
   }
 }
+
