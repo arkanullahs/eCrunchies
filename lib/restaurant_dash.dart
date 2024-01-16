@@ -6,7 +6,7 @@ import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'restaurant_dash_show_items.dart';
 import 'restaurant_dash_show_order_list.dart';
-//import 'add_offer_page.dart'; // Import the AddOfferPage
+import 'chat_screen.dart'; // Import the ChatScreen
 
 class RestaurantDashboard extends StatefulWidget {
   @override
@@ -23,7 +23,7 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
   final nameController2 = TextEditingController();
   final priceController2 = TextEditingController();
   final descriptionController2 = TextEditingController();
-  int val=0;
+  int val = 0;
 
   int itemCount = 0; // To maintain the count of items
 
@@ -81,8 +81,7 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
               ElevatedButton(
                 onPressed: () async {
                   String name = nameController.text;
-                  double price =
-                      double.tryParse(priceController.text) ?? 0.0;
+                  double price = double.tryParse(priceController.text) ?? 0.0;
                   String description = descriptionController.text;
 
                   // Add a new document without passing a document ID
@@ -124,7 +123,6 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
     }
   }
 
-
   @override
   void dispose() {
     nameController.dispose();
@@ -133,8 +131,6 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
     super.dispose();
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -142,28 +138,37 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
         title: Text('Restaurant Dashboard'),
       ),
       floatingActionButton: SpeedDial(
-        // Replaces the FloatingActionButton with a PopupMenuButton
-        //icon: Icons.add,
         animatedIcon: AnimatedIcons.menu_arrow,
         children: [
-      SpeedDialChild(
-      child: Icon(Icons.add_circle_outline),
-      label: 'Add New Item',
-      onTap: () async {
-        await addNewItem();
-
-      } ),
-      SpeedDialChild(
-      child: Icon(Icons.local_offer_outlined),
-      label: 'Add Offer',
-          onTap: () async {
-            //await addNewOffer();
-
-          }  ),
+          SpeedDialChild(
+            child: Icon(Icons.add_circle_outline),
+            label: 'Add New Item',
+            onTap: () async {
+              await addNewItem();
+            },
+          ),
+          SpeedDialChild(
+            child: Icon(Icons.local_offer_outlined),
+            label: 'Add Offer',
+            onTap: () async {
+              //await addNewOffer();
+            },
+          ),
+          SpeedDialChild(
+            child: Icon(Icons.chat_bubble_outline),
+            label: 'Chat with user',
+            onTap: () async {
+              // Open the ChatScreen when the button is tapped
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ChatScreen(),
+                ),
+              );
+            },
+          ),
         ],
       ),
-
-
       body: Center(
         child: Text('Your Dashboard Content Here'),
       ),
@@ -178,7 +183,8 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => ShowOrder().buildOrderList(context),
+                    builder: (context) =>
+                        ShowOrder().buildOrderList(context),
                   ),
                 );
               },
@@ -199,4 +205,3 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
     );
   }
 }
-

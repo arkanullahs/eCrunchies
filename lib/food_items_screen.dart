@@ -3,7 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'food_details_screen.dart';
 import 'food_model.dart';
 import 'foods_screen.dart';
-
+import 'package:flutter/material.dart';
+import 'restaurant_menu_screen.dart'; // Import your
 class FoodItemsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -42,37 +43,41 @@ class FoodItemsScreen extends StatelessWidget {
 
                     return GestureDetector(
                       onTap: () {
+                        // Inside FoodItemsScreen build method
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => FoodDetailsScreen(
-                              food: Food(
-                                restaurant: 'Sample Restaurant',
-                                name: name,
-                                price: price, // Sample price
-                                image: imageUrl,
-                                description:description,// Use the fetched image URL here
-                              ),
-                            ),
+                            builder: (context) =>
+                                FoodDetailsScreen(
+                                  food: Food(
+                                    restaurant: 'Sample Restaurant',
+                                    name: name,
+                                    price: price,
+                                    // Sample price
+                                    image: imageUrl,
+                                    description: description, // Use the fetched image URL here
+                                  ),
+                                  restaurantOwnerId: 'yourRestaurantOwnerId', // Pass the required parameter
+                                ),
                           ),
                         );
-                      },
-                      child: Container(
-                        width: 150,
-                        height: 150,
-                        margin: EdgeInsets.symmetric(horizontal: 8),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15),
-                          image: DecorationImage(
-                            image: NetworkImage(imageUrl), // Use network image
-                            fit: BoxFit.contain,
+                        child:
+                        Container(
+                          width: 150,
+                          height: 150,
+                          margin: EdgeInsets.symmetric(horizontal: 8),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(15),
+                            image: DecorationImage(
+                              image: NetworkImage(imageUrl),
+                              // Use network image
+                              fit: BoxFit.contain,
+                            ),
                           ),
-                        ),
 
 
-                      ),
-
-
+                        );
+                      }
                     );
                   },
                 );
@@ -83,4 +88,5 @@ class FoodItemsScreen extends StatelessWidget {
       ),
     );
   }
-}
+ }
+

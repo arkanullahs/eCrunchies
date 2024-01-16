@@ -2,12 +2,16 @@ import 'package:flutter/material.dart';
 import 'chat_screen.dart';
 import 'food_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class FoodDetailsScreen extends StatefulWidget {
   final Food food;
+  final String restaurantOwnerId; // Pass the restaurant owner's ID
 
   FoodDetailsScreen({
     required this.food,
+    required this.restaurantOwnerId,
+
   });
 
   @override
@@ -18,7 +22,47 @@ class _FoodDetailsScreenState extends State<FoodDetailsScreen> {
   final TextEditingController _quantityController = TextEditingController();
   bool _isValid = true;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+  FlutterLocalNotificationsPlugin();
+//////////**************
+  get yourFoodObject => null;
 
+  @override
+  void initState() {
+    super.initState();
+
+    // Initialize the local notification plugin
+    var initializationSettingsAndroid = AndroidInitializationSettings('app_icon');
+    //var initializationSettingsIOS = IOSInitializationSettings();
+    var initializationSettings = InitializationSettings(
+        android: initializationSettingsAndroid);
+      //  android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
+    flutterLocalNotificationsPlugin.initialize(initializationSettings);
+  }
+
+  Future<void> _showNotification() async {
+    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
+      'your_channel_id', // Change this to a unique channel ID
+      'Your Channel Name',
+     // 'Your Channel Description',
+      importance: Importance.max,
+      priority: Priority.high,
+    );
+    //var iOSPlatformChannelSpecifics = IOSNotificationDetails();
+    var platformChannelSpecifics = NotificationDetails(
+      android: androidPlatformChannelSpecifics,
+     // iOS: iOSPlatformChannelSpecifics,
+    );
+
+    await flutterLocalNotificationsPlugin.show(
+      0, // Notification ID
+      'New Message', // Title
+      'You have a new message from the restaurant owner.', // Body
+      platformChannelSpecifics,
+      payload: 'item x', // You can add extra data here
+    );
+  }
+/////////
   Future<void> sendOrderData(int quantity) async {
     Map<String, dynamic> orderData = {
       'foodName': widget.food.name,
@@ -134,15 +178,22 @@ class _FoodDetailsScreenState extends State<FoodDetailsScreen> {
                       ? () {
                     int quantity = int.tryParse(_quantityController.text) ?? 0;
                     sendOrderData(quantity);
-                    // **************************************************Uncomment the following lines if you want to navigate to ChatScreen
-                     Navigator.push(
-                       context,
-                       MaterialPageRoute(
-                         builder: (context) => ChatScreen(restaurantOwnerId: 'yourActualRestaurantOwnerId'),
-                       ),
-                     );
+                    //////////////// Show a notification when a message is sent
+                    _showNotification();
+                    ///////  navigate to ChatScreen
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => FoodDetailsScreen(
+                          food: yourFoodObject, // Replace with your actual food object
+                          restaurantOwnerId: 'yourRestaurantOwnerId', // Replace with the actual ID
+                        ),
+                      ),
+                    );
+
                   }
                       : null,
+
                   style: ElevatedButton.styleFrom(
                     padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16),
                     primary: Colors.deepOrangeAccent,

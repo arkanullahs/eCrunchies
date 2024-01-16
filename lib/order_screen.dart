@@ -5,10 +5,9 @@ import 'food_items_screen.dart';
 import 'discover_screen.dart';
 import 'foods_screen.dart';
 import 'restaurant_menu_screen.dart';
-import 'chat_screen.dart'; // Import the chat screen
+import 'chat_screen.dart';
 
 class OrderScreen extends StatefulWidget {
-  // Add the restaurantOwnerId parameter to pass to the ChatScreen
   final String restaurantOwnerId;
 
   OrderScreen({required this.restaurantOwnerId});
@@ -19,6 +18,8 @@ class OrderScreen extends StatefulWidget {
 
 class _OrderScreenState extends State<OrderScreen> {
   String searchQuery = '';
+/////////////////////*************************
+  get yourFoodObject => null;
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +31,7 @@ class _OrderScreenState extends State<OrderScreen> {
             onTap: () {
               showSearch(
                 context: context,
-                delegate: RestaurantSearchDelegate(), // Use custom search delegate
+                delegate: RestaurantSearchDelegate(),
               );
             },
             child: Padding(
@@ -43,12 +44,12 @@ class _OrderScreenState extends State<OrderScreen> {
           ),
           GestureDetector(
             onTap: () {
-              Navigator.pushReplacementNamed(context, '/'); // Navigate to login screen
+              Navigator.pushReplacementNamed(context, '/');
             },
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Icon(
-                Icons.logout, // Use a logout icon here
+                Icons.logout,
                 size: 32,
               ),
             ),
@@ -60,22 +61,7 @@ class _OrderScreenState extends State<OrderScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(height: 10),
-          /////////////////  //  a button to place an order
-          /*  ElevatedButton(
-              onPressed: () {
-                // Perform order logic
-
-                // Now, navigate to the ChatScreen after placing the order
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ChatScreen(restaurantOwnerId: widget.restaurantOwnerId),
-                  ),
-                );
-              },
-             // child: Text('Place Order'),
-            ),*/
-            FoodsScreen(), // Food page view
+            FoodsScreen(),
             SizedBox(height: 12),
             Padding(
               padding: const EdgeInsets.all(16.0),
@@ -92,15 +78,20 @@ class _OrderScreenState extends State<OrderScreen> {
             SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
-                // Replace 'restaurantOwnerId' with the actual ID of the restaurant owner
+                // Place order logic here
+
+                // Navigate to the FoodDetailsScreen after placing the order
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => ChatScreen(restaurantOwnerId: 'restaurantOwnerId'),
+                    builder: (context) => FoodDetailsScreen(
+                      food: yourFoodObject, // Replace with your actual food object
+                      restaurantOwnerId: widget.restaurantOwnerId,
+                    ),
                   ),
                 );
               },
-              child: Text('Chat with Restaurant Owner'),
+              child: Text('Place Order'),
             ),
           ],
         ),
@@ -197,6 +188,7 @@ class SearchResults extends StatelessWidget {
     );
   }
 }
+
 class RestaurantCard extends StatelessWidget {
   final String imageUrl;
   final String name;

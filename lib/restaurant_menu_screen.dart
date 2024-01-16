@@ -57,13 +57,16 @@ class RestaurantMenuScreen extends StatelessWidget {
                           image: imageUrl,
                           description: description,
                         ),
+                        restaurantOwnerId: 'yourRestaurantOwnerId', // Pass the required parameter
+
                       ),
                     ),
                   );
                 },
                 child: ListTile(
                   title: Text(foodName),
-                  subtitle: Text('\$$price'),
+                  //////*********************
+                  subtitle: Text('\৳৳ price'),
                   leading: CircleAvatar(
                     backgroundImage: NetworkImage(imageUrl),
                   ),
