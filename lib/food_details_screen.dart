@@ -40,20 +40,15 @@ class _FoodDetailsScreenState extends State<FoodDetailsScreen> {
       'foodName': widget.food.name,
       'price': widget.food.price,
       'quantity': quantity,
-      'timeSent': FieldValue.serverTimestamp(), // Include server timestamp
-      // Add other order details as needed
+      'timeSent': FieldValue.serverTimestamp(),
+      'restaurantId':widget.food.restaurantId,
     };
+
     try {
       DocumentReference orderRef =
       await _firestore.collection('orders').add(orderData);
-      //String orderId = orderRef.id;
-
-      // Order data added successfully to Firestore
-
-      // Now, you can use orderRef to get the order ID and pass it to the chat screen
       String orderId = orderRef.id;
 
-      // Open the chat screen after placing the order
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -64,7 +59,6 @@ class _FoodDetailsScreenState extends State<FoodDetailsScreen> {
         ),
       );
     } catch (e) {
-      // Error handling, if needed
       print('Error: $e');
     }
   }
@@ -173,7 +167,7 @@ class _FoodDetailsScreenState extends State<FoodDetailsScreen> {
                     await sendOrderData(quantity);
 
                     // Open the chat screen after placing the order
-                    Navigator.push(
+                    /*Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => ChatScreen(
@@ -181,7 +175,7 @@ class _FoodDetailsScreenState extends State<FoodDetailsScreen> {
                           orderId: '',
                         ),
                       ),
-                    );
+                    );*/
                   }
                       : null,
                   style: ElevatedButton.styleFrom(

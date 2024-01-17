@@ -52,7 +52,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 List<Widget> messageWidgets = [];
                 for (var message in messages) {
                   var messageData = message.data() as Map<String, dynamic>;
-                  var messageText = messageData['content'];
+                  var messageText = messageData['message'];
                   var senderId = messageData['senderId'];
 
                   var messageWidget = MessageWidget(
@@ -94,7 +94,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
                         // Replace 'user_id' with the actual user ID
                         await _chatService.sendMessage(
-                          userId,
+                          'user_id',
                           widget.restaurantId,
                           widget.orderId,
                           _messageController.text,
@@ -104,27 +104,28 @@ class _ChatScreenState extends State<ChatScreen> {
                       }
                     }
                   },
-                  icon: Icon(Icons.send),
+                  icon: Icon(Icons.message_rounded),
                 ),
                 IconButton(
                   onPressed: () async {
                     if (_messageController.text.isNotEmpty) {
-                      User? user;
-                      await _chatService.sendMessage(
-                       'user_id', // Replace 'user_id' with the actual user ID
-                      //  User? user = FirebaseAuth.instance.currentUser
-                          // Check if the user is signed in
-                          //if (user != null) {
-                      //  String userId = user.uid;
-                        // Now, you can use 'userId' in place of 'user_id' in your code.
-                      //}
+                      // Get the current user
+                      User? user = FirebaseAuth.instance.currentUser;
 
-                        widget.restaurantId,
-                        widget.orderId,
-                        _messageController.text,
-                      );
+                      // Check if the user is signed in
+                      if (user != null) {
+                        String userId = user.uid;
 
-                      _messageController.clear();
+                        // Replace 'user_id' with the actual user ID
+                        await _chatService.sendMessage(
+                          widget.restaurantId,
+                          userId,
+                          widget.orderId,
+                          _messageController.text,
+                        );
+
+                        _messageController.clear();
+                      }
                     }
                   },
                   icon: Icon(Icons.send),
@@ -138,44 +139,12 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 }
 
-  Future<void> _sendMessage() async {
-    var _messageController;
-    String content = _messageController.text.trim();
-    if (content.isNotEmpty) {
-      Message message = Message(
-        senderId: 'user_id_here', // Replace with the actual user ID from authentication
-        content: content,
-        timestamp: DateTime.now(),
-        receiverId: '',
-        orderId: '',
-        message: '',
-      );
-      final FirebaseFirestore _firestore = FirebaseFirestore.instance; // Add this line
-
-      try {
-        await _firestore
-            .collection('chats')
-            .doc('your_document_id_here')
-            .set({
-          'senderId': message.senderId,
-          'content': message.content,
-          'timestamp': message.timestamp,
-        });
-
-
-        var _messageController;
-        _messageController.clear();
-      } catch (e) {
-        // Handle any errors if necessary
-        print('Error sending message: $e');
-      }
-    }
-  }
 
 
 class MessageWidget extends StatelessWidget {
   final String senderId;
   final String content;
+
 
   MessageWidget({
     required this.senderId,

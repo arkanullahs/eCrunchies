@@ -4,7 +4,10 @@ class ChatService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<void> sendMessage(String senderId, String receiverId, String orderId, String message) async {
-    await _firestore.collection('messages').add({
+    await _firestore
+        .collection('chats')
+        .doc('Chillox')
+        .collection('messages').add({
       'senderId': senderId,
       'receiverId': receiverId,
       'orderId': orderId,
