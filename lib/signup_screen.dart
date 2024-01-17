@@ -117,7 +117,8 @@ class _SignupScreenState extends State<SignupScreen> {
               children: [
                 Image.asset(
                   'assets/login-icon/food_delivery_logo.png',
-                  height: 200,
+                  height: 150,
+                  fit: BoxFit.fitHeight,
                 ),
                 SizedBox(height: 32),
                 TextField(
