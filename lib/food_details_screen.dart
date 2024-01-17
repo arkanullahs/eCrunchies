@@ -1,6 +1,23 @@
 import 'package:flutter/material.dart';
 import 'food_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'chat_screen.dart';
+
+class Food {
+  final String name;
+  final double price;
+  final String restaurantId; // Add this property
+  final String image;
+  final String description;
+
+  Food({
+    required this.name,
+    required this.price,
+    required this.restaurantId,
+    required this.image,
+    required this.description, required String restaurant,
+  });
+}
 
 class FoodDetailsScreen extends StatefulWidget {
   final Food food;
@@ -26,10 +43,26 @@ class _FoodDetailsScreenState extends State<FoodDetailsScreen> {
       'timeSent': FieldValue.serverTimestamp(), // Include server timestamp
       // Add other order details as needed
     };
-
     try {
+      DocumentReference orderRef =
       await _firestore.collection('orders').add(orderData);
+      //String orderId = orderRef.id;
+
       // Order data added successfully to Firestore
+
+      // Now, you can use orderRef to get the order ID and pass it to the chat screen
+      String orderId = orderRef.id;
+
+      // Open the chat screen after placing the order
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ChatScreen(
+            restaurantId: widget.food.restaurantId,
+            orderId: orderId,
+          ),
+        ),
+      );
     } catch (e) {
       // Error handling, if needed
       print('Error: $e');
@@ -44,13 +77,6 @@ class _FoodDetailsScreenState extends State<FoodDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    List<String> restaurantImages = [
-      'assets/restaurant_0.png', // Restaurant 0 image
-      'assets/restaurant_1.png', // Restaurant 1 image
-      'assets/restaurant_2.png', // Restaurant 2 image
-      // Add more restaurant images here as needed
-    ];
-
     return Scaffold(
       appBar: AppBar(
         title: Text('Order ${widget.food.name}'),
@@ -129,7 +155,8 @@ class _FoodDetailsScreenState extends State<FoodDetailsScreen> {
                       ),
                       onChanged: (value) {
                         setState(() {
-                          _isValid = int.tryParse(value) != null && int.parse(value) > 0;
+                          _isValid =
+                              int.tryParse(value) != null && int.parse(value) > 0;
                         });
                       },
                     ),
@@ -140,9 +167,21 @@ class _FoodDetailsScreenState extends State<FoodDetailsScreen> {
               Center(
                 child: ElevatedButton(
                   onPressed: _isValid
-                      ? () {
-                    int quantity = int.tryParse(_quantityController.text) ?? 0;
-                    sendOrderData(quantity);
+                      ? () async {
+                    int quantity =
+                        int.tryParse(_quantityController.text) ?? 0;
+                    await sendOrderData(quantity);
+
+                    // Open the chat screen after placing the order
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ChatScreen(
+                          restaurantId: widget.food.restaurantId,
+                          orderId: '',
+                        ),
+                      ),
+                    );
                   }
                       : null,
                   style: ElevatedButton.styleFrom(
