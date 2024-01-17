@@ -20,7 +20,7 @@ class UserTypeSelection extends StatelessWidget {
               height: 150,fit: BoxFit.fitHeight,
 
             ),
-            SizedBox(height: 16),
+            SizedBox(height: 32),
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
