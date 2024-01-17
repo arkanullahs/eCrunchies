@@ -16,8 +16,11 @@ class UserTypeSelection extends StatelessWidget {
           children: [
             Image.asset(
               'assets/login-icon/food_delivery_logo.png',
-              height: 170,
+              //height: 170,
+              height: 150,fit: BoxFit.fitHeight,
+
             ),
+            SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
