@@ -2,8 +2,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'food_model.dart';
+
 import 'food_details_screen.dart';
+//import 'food_model.dart';
+//import 'food_details_screen.dart';
 
 class RestaurantMenuScreen extends StatelessWidget {
   final String restaurantName;
@@ -55,7 +57,7 @@ class RestaurantMenuScreen extends StatelessWidget {
                           name: foodName,
                           price: price,
                           image: imageUrl,
-                          description: description,
+                          description: description, restaurantId: '',
                         ),
                       ),
                     ),

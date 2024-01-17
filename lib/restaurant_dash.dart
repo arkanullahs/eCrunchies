@@ -7,6 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'restaurant_dash_show_items.dart';
 import 'restaurant_dash_show_order_list.dart';
 //import 'add_offer_page.dart'; // Import the AddOfferPage
+import 'chat_screen.dart'; // Import your chat screen
 
 class RestaurantDashboard extends StatefulWidget {
   @override
@@ -179,6 +180,17 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => ShowOrder().buildOrderList(context),
+                  ),
+                );
+              },
+            ),
+            IconButton(
+              icon: Icon(Icons.message),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ChatScreen(restaurantId: 'your_restaurant_id_here', orderId: '',),
                   ),
                 );
               },

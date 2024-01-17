@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+//import 'food_details_screen.dart';
+//import 'food_model.dart';
 import 'food_details_screen.dart';
-import 'food_model.dart';
 import 'foods_screen.dart';
 
 
@@ -51,7 +52,7 @@ class FoodsScreen extends StatelessWidget {
                                 name: name,
                                 price: price,
                                 image: imageUrl,
-                                description: 'Will Fix That Later-Saad',
+                                description: 'Will Fix That Later-Saad', restaurantId: '',
                               ),
                             ),
                           ),
