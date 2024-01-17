@@ -166,7 +166,7 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
 
 
       body: Center(
-        child: Text('Your Dashboard Content Here'),
+        child: Text('WELCOME restaurantOwner'),
       ),
       bottomNavigationBar: BottomAppBar(
         shape: CircularNotchedRectangle(),
@@ -184,7 +184,7 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
                 );
               },
             ),
-            IconButton(
+            /*IconButton(
               icon: Icon(Icons.message),
               onPressed: () {
                 Navigator.push(
@@ -194,7 +194,7 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
                   ),
                 );
               },
-            ),
+            ),*/
             IconButton(
               icon: Icon(Icons.checklist),
               onPressed: () {

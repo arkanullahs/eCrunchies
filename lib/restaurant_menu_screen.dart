@@ -19,7 +19,7 @@ class RestaurantMenuScreen extends StatelessWidget {
         title: Text('$restaurantName Menu'),
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance.collection('Foods')
+        stream: FirebaseFirestore.instance.collection('items')
             .where('restaurant', isEqualTo: restaurantName)
             .snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
