@@ -284,13 +284,10 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                     },
                   ),
                 ),
-                /*SizedBox(height: 16),
+                SizedBox(height: 16),
                 _buildUserTypeSelection(),
-                SizedBox(height: 32),
-                ElevatedButton(
-                  onPressed: _login,
-                  child: Text('Login'),
-                ),*/
+                //SizedBox(height: 32),
+
                 SizedBox(height: 16),
                 TextButton(
                   onPressed: () {
