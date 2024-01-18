@@ -170,7 +170,7 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => ChatScreen(restaurantId: 'your_restaurant_id_here', orderId: ''),
+                  builder: (context) => ChatScreen(restaurantId: 'Chillox', orderId: 'llcgb7TzDXooLivc9Tkk'),
                 ),
               );
             },
