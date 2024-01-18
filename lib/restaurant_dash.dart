@@ -142,6 +142,7 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
       appBar: AppBar(
         title: Text('Restaurant Dashboard'),
       ),
+
       floatingActionButton: SpeedDial(
         // Replaces the FloatingActionButton with a PopupMenuButton
         //icon: Icons.add,
@@ -154,6 +155,7 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
         await addNewItem();
 
       } ),
+
       SpeedDialChild(
       child: Icon(Icons.local_offer_outlined),
       label: 'Add Offer',
@@ -161,9 +163,22 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
             //await addNewOffer();
 
           }  ),
+          SpeedDialChild(
+            child: Icon(Icons.message),
+            label: 'Message',
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ChatScreen(restaurantId: 'your_restaurant_id_here', orderId: ''),
+                ),
+              );
+            },
+          ),
         ],
       ),
-
+    //);
+ // }
 
       body: Center(
         child: Text('WELCOME restaurantOwner'),
@@ -184,6 +199,7 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
                 );
               },
             ),
+            ///////////////////
             /*IconButton(
               icon: Icon(Icons.message),
               onPressed: () {
