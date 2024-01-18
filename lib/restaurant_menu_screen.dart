@@ -45,6 +45,7 @@ class RestaurantMenuScreen extends StatelessWidget {
               final double price = document['price'];
               final String imageUrl = document['imageUrl'];
               final String description = document['description'];
+              final String restaurantId = document['restaurant'];
 
               return GestureDetector(
                 onTap: () {
@@ -57,7 +58,8 @@ class RestaurantMenuScreen extends StatelessWidget {
                           name: foodName,
                           price: price,
                           image: imageUrl,
-                          description: description, restaurantId: '',
+                          description: description,
+                          restaurantId: 'Chillox',
                         ),
                       ),
                     ),
