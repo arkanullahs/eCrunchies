@@ -38,6 +38,9 @@ dependencies:
   flutter_spinkit: ^5.2.0
   firebase_storage: ^11.0.1
   image_picker: ^0.8.4+4
+  google_sign_in: ^5.0.7
+  flutter_facebook_auth: ^4.2.1
+  #  firebase_auth_oauth: ^2.0.2
   firebase_database:
   flutter_speed_dial:
 
@@ -64,6 +67,8 @@ dev_dependencies:
 flutter:
   assets:
     - assets/login-icon/
+    - assets/facebook_logo.png
+    - assets/google_logo.png
 
 
   # The following line ensures that the Material Icons font is

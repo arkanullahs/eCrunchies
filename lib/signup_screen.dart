@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'login_screen.dart';
 import 'user_type.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 
 class UserType {
   static const String user = 'User';
@@ -31,6 +33,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
   String _selectedUserType = UserType.user;
 
+
   Future<void> _signUp() async {
     try {
       UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
@@ -55,6 +58,30 @@ class _SignupScreenState extends State<SignupScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Sign up failed. Please try again.'),
+          duration: Duration(seconds: 3),
+        ),
+      );
+    }
+  }
+  // Google Sign-In
+  Future<void> _signInWithGoogle() async {
+    try {
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      final GoogleSignInAuthentication googleAuth = await googleUser!.authentication;
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      await _auth.signInWithCredential(credential);
+
+      // Handle user data storage and navigation
+      //_handleSocialMediaSignIn();
+    } catch (e) {
+      print('Google Sign-In failed: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Google Sign-In failed. Please try again.'),
           duration: Duration(seconds: 3),
         ),
       );
@@ -104,6 +131,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var _signInWithFacebook;
     return Scaffold(
       appBar: AppBar(
         title: Text('Sign Up'),
@@ -173,6 +201,38 @@ class _SignupScreenState extends State<SignupScreen> {
                   onPressed: _signUp,
                   child: Text('Sign Up'),
                 ),
+                // Social Media Login Buttons
+                ElevatedButton(
+                  onPressed: _signInWithGoogle,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Image.asset(
+                        'assets/google_logo.png', // Replace with your Google logo image path
+                        height: 20,
+                      ),
+                      SizedBox(width: 8),
+                      Text('Sign Up with Google'),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 8),
+                ElevatedButton(
+                  onPressed: _signInWithFacebook,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Image.asset(
+                        'assets/facebook_logo.png', // Replace with your Facebook logo image path
+                        height: 20,
+                      ),
+                      SizedBox(width: 8),
+                      Text('Sign Up with Facebook'),
+                    ],
+                  ),
+                ),
+
+
                 SizedBox(height: 16),
                 TextButton(
                   onPressed: () {
@@ -191,3 +251,10 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 }
+
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    throw UnimplementedError();
+  }
+//}
