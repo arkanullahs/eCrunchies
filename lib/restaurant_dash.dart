@@ -10,6 +10,8 @@ import 'restaurant_dash_show_order_list.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 //import 'add_offer_page.dart'; // Import the AddOfferPage
 import 'chat_screen.dart'; // Import your chat screen
+import 'package:loading_overlay/loading_overlay.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class RestaurantDashboard extends StatefulWidget {
   @override
@@ -17,6 +19,7 @@ class RestaurantDashboard extends StatefulWidget {
 }
 
 class _RestaurantDashboardState extends State<RestaurantDashboard> {
+  bool isLoading = false;
   final ShowOrder _showOrder = ShowOrder();
   late String imageUrl = '';
   final picker = ImagePicker();
@@ -75,94 +78,118 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
 
   Future<void> fetchOrderIds() async {
     QuerySnapshot<Map<String, dynamic>> querySnapshot =
-    await _firestore.collection('orders').where('restaurant', isEqualTo: restaurantName).get();
+    await _firestore.collection('orders').where('restaurantName', isEqualTo: restaurantName).get();
+
+    List<String> fetchedOrderIds = querySnapshot.docs.map((doc) => doc.id).toList();
 
     setState(() {
-      orderIds = querySnapshot.docs.map((doc) => doc.id).toList();
+      orderIds = fetchedOrderIds;
     });
   }
+
 
   Future<void> addNewItem() async {
     final pickedFile = await picker.getImage(source: ImageSource.gallery);
     if (pickedFile != null) {
-      String fileName = pickedFile.path.split('/').last;
+      setState(() {
+        isLoading = true;
+      });
 
-      firebase_storage.Reference ref = firebase_storage.FirebaseStorage.instance
-          .ref()
-          .child('items/$fileName');
+      try {
+        String fileName = pickedFile.path.split('/').last;
 
-      await ref.putFile(new File(pickedFile.path));
-      imageUrl = await ref.getDownloadURL();
+        firebase_storage.Reference ref = firebase_storage.FirebaseStorage.instance
+            .ref()
+            .child('items/$fileName');
 
-      await showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Enter Name, Price, and Description'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                TextField(
-                  controller: nameController,
-                  decoration: InputDecoration(labelText: 'Name'),
-                ),
-                TextField(
-                  controller: priceController,
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(labelText: 'Price'),
-                ),
-                TextField(
-                  controller: descriptionController,
-                  decoration: InputDecoration(labelText: 'Description'),
-                ),
-              ],
-            ),
-            actions: <Widget>[
-              ElevatedButton(
-                onPressed: () async {
-                  String name = nameController.text;
-                  double price =
-                      double.tryParse(priceController.text) ?? 0.0;
-                  String description = descriptionController.text;
+        await ref.putFile(new File(pickedFile.path));
+        imageUrl = await ref.getDownloadURL();
 
-                  // Add a new document without passing a document ID
-                  await FirebaseFirestore.instance.collection('items').add({
-                    'description': description,
-                    'name': name,
-                    'price': price,
-                    'imageUrl': imageUrl,
-                    'timestamp': FieldValue.serverTimestamp(),
-                  });
+        await showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Enter Name, Price, and Description'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  TextField(
+                    controller: nameController,
+                    decoration: InputDecoration(labelText: 'Name'),
+                  ),
+                  TextField(
+                    controller: priceController,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(labelText: 'Price'),
+                  ),
+                  TextField(
+                    controller: descriptionController,
+                    decoration: InputDecoration(labelText: 'Description'),
+                  ),
+                ],
+              ),
+              actions: <Widget>[
+                ElevatedButton(
+                  onPressed: () async {
+                    String name = nameController.text;
+                    double price = double.tryParse(priceController.text) ?? 0.0;
+                    String description = descriptionController.text;
 
-                  setState(() {
-                    imageUrl = '';
-                  });
+                    // Add a new document without passing a document ID
+                    await FirebaseFirestore.instance.collection('items').add({
+                      'description': description,
+                      'name': name,
+                      'price': price,
+                      'imageUrl': imageUrl,
+                      'timestamp': FieldValue.serverTimestamp(),
+                      'restaurant': restaurantName,
+                    });
 
-                  nameController.clear();
-                  priceController.clear();
-                  descriptionController.clear();
+                    setState(() {
+                      imageUrl = '';
+                    });
 
-                  await fetchItemCount(); // Update the itemCount after adding a new item
+                    nameController.clear();
+                    priceController.clear();
+                    descriptionController.clear();
 
-                  Navigator.of(context).pop(); // Dismiss the dialog after adding the item
-                },
-                child: Text('Add'),
-                style: ElevatedButton.styleFrom(
-                  primary: Colors.deepOrangeAccent,
-                  elevation: 5,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+                    await fetchItemCount(); // Update the itemCount after adding a new item
+
+                    Fluttertoast.showToast(
+                      msg: 'Item added successfully!',
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.BOTTOM,
+                      timeInSecForIosWeb: 1,
+                      backgroundColor: Colors.green,
+                      textColor: Colors.white,
+                      fontSize: 16.0,
+                    );
+
+                    Navigator.of(context).pop(); // Dismiss the dialog after adding the item
+                  },
+                  child: Text('Add'),
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.deepOrangeAccent,
+                    elevation: 5,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
                 ),
-              ),
-            ],
-          );
-        },
-      );
+              ],
+            );
+          },
+        );
+      } finally {
+        setState(() {
+          isLoading = false;
+        });
+      }
     } else {
       print('No image selected.');
     }
   }
+
 
 
   @override
@@ -176,11 +203,13 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
 
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context) { return LoadingOverlay(
+      isLoading: isLoading,
+      child: Scaffold(
       appBar: AppBar(
         title: Text('Restaurant Dashboard'),
       ),
+
 
       floatingActionButton: SpeedDial(
         // Replaces the FloatingActionButton with a PopupMenuButton
@@ -194,57 +223,8 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
         await addNewItem();
 
       } ),
-
-          SpeedDialChild(
+    /*SpeedDialChild(
             child: Icon(Icons.local_offer_outlined),
-            label: 'Add Offer',
-            onTap: () async {
-              // Fetch orderIds that match the restaurantName
-              QuerySnapshot<Map<String, dynamic>> ordersSnapshot = await FirebaseFirestore.instance
-                  .collection('orders')
-                  .where('restaurant', isEqualTo: restaurantName)
-                  .get();
-              print(restaurantName);
-
-              List<String> orderIds = ordersSnapshot.docs.map((doc) => doc.id).toList();
-
-              // Show a dialog with a list of orderIds
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: Text('Select an Order'),
-                    content: Container(
-                      width: double.maxFinite,
-                      child: ListView.builder(
-                        itemCount: orderIds.length,
-                        itemBuilder: (context, index) {
-                          String orderId = orderIds[index];
-                          return ListTile(
-                            title: Text('Order ID: $orderId'),
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => OrderChatScreen(
-                                    restaurantId: restaurantName,
-                                    orderId: orderId,
-                                  ),
-                                ),
-                              );
-                            },
-                          );
-                        },
-                      ),
-                    ),
-                  );
-                },
-              );
-            },
-          ),
-
-          SpeedDialChild(
-            child: Icon(Icons.message),
             label: 'Message',
             onTap: () async {
               // Fetch the current user's email
@@ -256,9 +236,104 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
                 MaterialPageRoute(
                   builder: (context) => OrderChatScreen(
                     restaurantId: restaurantName, // Use the user's email as the restaurant ID
-                    orderId: orderIds.first, // You can provide an order ID if needed
+                    orderId: 'dummy', // You can provide an order ID if needed
                   ),
                 ),
+              );
+            },
+          ),*/
+          SpeedDialChild(
+            child: Icon(Icons.message_rounded),
+            label: 'Messages',
+            onTap: () async {
+              // Fetch orderIds that match the restaurantName
+              QuerySnapshot<Map<String, dynamic>> ordersSnapshot = await FirebaseFirestore.instance
+                  .collection('orders')
+                  .where('restaurantName', isEqualTo: restaurantName)
+                  .get();
+              print(restaurantName);
+
+              List<String> orderIds = ordersSnapshot.docs.map((doc) => doc.id).toList();
+
+              // Show a dialog with a list of orderIds
+              await showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return FutureBuilder(
+                    future: Future.delayed(Duration(seconds: 2)), // Simulating a delay, replace it with your actual data fetching logic
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        // Return a loading indicator while data is being fetched
+                        return AlertDialog(
+                          content: Container(
+                            width: 5,
+                            height: 35,// Adjust the width as needed
+                            child: Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                          ),
+                        );
+                      } else {
+                        // Data has been loaded, display the dialog
+                        return AlertDialog(
+                          title: Text('Select an Order'),
+                          content: Container(
+                            width: double.maxFinite,
+                            child: ListView.builder(
+                              itemCount: orderIds.length,
+                              itemBuilder: (context, index) {
+                                String orderId = orderIds[index];
+                                print("dummy:$orderId");
+                                return Column(
+                                  children: [
+                                    ListTile(
+                                      title: Text(
+                                        'Order ID: $orderId',
+                                        style: TextStyle(fontSize: 16),
+                                      ),
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => OrderChatScreen(
+                                              restaurantId: restaurantName,
+                                              orderId: orderId,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                    Divider(
+                                      color: Colors.grey,
+                                      thickness: 1,
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16), // Adjust the radius as needed
+                          ),
+                          actions: <Widget>[
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: Text(
+                                'Cancel',
+                                style: TextStyle(
+                                  color: Colors.deepOrangeAccent,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      }
+                    },
+                  );
+                },
               );
             },
           ),
@@ -313,7 +388,8 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-    );
+    )
+  );
   }
 }
 
