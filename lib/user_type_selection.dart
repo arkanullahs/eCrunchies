@@ -25,7 +25,7 @@ class UserTypeSelection extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => signup.SignupScreen(userType: '',)),
+                  MaterialPageRoute(builder: (context) => signup.SignupScreen(userType: UserType.user)),
                 );
               },
               style: ElevatedButton.styleFrom(

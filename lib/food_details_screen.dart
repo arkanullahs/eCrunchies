@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'food_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'chat_screen.dart';
-
+import 'order_chat_screen.dart';
 class Food {
   final String name;
   final double price;
@@ -41,7 +41,7 @@ class _FoodDetailsScreenState extends State<FoodDetailsScreen> {
       'price': widget.food.price,
       'quantity': quantity,
       'timeSent': FieldValue.serverTimestamp(),
-      'restaurantId':widget.food.restaurantId,
+      'restaurantId': widget.food.restaurantId,
     };
 
     try {
@@ -52,7 +52,7 @@ class _FoodDetailsScreenState extends State<FoodDetailsScreen> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => ChatScreen(
+          builder: (context) => OrderChatScreen(
             restaurantId: widget.food.restaurantId,
             orderId: orderId,
           ),
@@ -165,17 +165,6 @@ class _FoodDetailsScreenState extends State<FoodDetailsScreen> {
                     int quantity =
                         int.tryParse(_quantityController.text) ?? 0;
                     await sendOrderData(quantity);
-
-                    // Open the chat screen after placing the order
-                    /*Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ChatScreen(
-                          restaurantId: widget.food.restaurantId,
-                          orderId: '',
-                        ),
-                      ),
-                    );*/
                   }
                       : null,
                   style: ElevatedButton.styleFrom(

@@ -4,6 +4,7 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'order_chat_screen.dart';
 import 'restaurant_dash_show_items.dart';
 import 'restaurant_dash_show_order_list.dart';
 //import 'add_offer_page.dart'; // Import the AddOfferPage
@@ -166,15 +167,23 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
           SpeedDialChild(
             child: Icon(Icons.message),
             label: 'Message',
-            onTap: () {
+            onTap: () async {
+              // Fetch the current user's email
+              String userEmail = 'user0@gmail.com'; // Replace with actual user email retrieval logic
+
+              // Open the chat screen for the current user's email
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => ChatScreen(restaurantId: 'Chillox', orderId: 'llcgb7TzDXooLivc9Tkk'),
+                  builder: (context) => OrderChatScreen(
+                    restaurantId: userEmail, // Use the user's email as the restaurant ID
+                    orderId: 'ibHKQThEN5BpoL8bwwpC', // You can provide an order ID if needed
+                  ),
                 ),
               );
             },
           ),
+
         ],
       ),
     //);
