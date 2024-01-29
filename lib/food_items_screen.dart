@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 //import 'food_details_screen.dart';
-//import 'food_model.dart';
+import 'food_model.dart';
 import 'food_details_screen.dart';
 import 'foods_screen.dart';
 
@@ -40,7 +40,9 @@ class FoodItemsScreen extends StatelessWidget {
                     final double price = document['price'];
                     final String imageUrl = document['imageUrl'];
                     final String description = document['description'];
+                    final String restaurant = document['restaurant'];
                     final String restaurantId = document['restaurant'];
+
 
                     return GestureDetector(
                       onTap: () {
@@ -49,12 +51,12 @@ class FoodItemsScreen extends StatelessWidget {
                           MaterialPageRoute(
                             builder: (context) => FoodDetailsScreen(
                               food: Food(
-                                restaurant: 'Sample Restaurant',
                                 name: name,
                                 price: price, // Sample price
                                 image: imageUrl,
                                 description:description,
-                                restaurantId: restaurantId,// Use the fetched image URL here
+                                restaurantId: restaurantId,
+                                restaurant: restaurant,// Use the fetched image URL here
                               ),
                             ),
                           ),

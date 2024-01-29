@@ -344,6 +344,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  fluttertoast:
+    dependency: "direct main"
+    description:
+      name: fluttertoast
+      sha256: dfdde255317af381bfc1c486ed968d5a43a2ded9c931e87cbecd88767d6a71c1
+      url: "https://pub.dev"
+    source: hosted
+    version: "8.2.4"
   glob:
     dependency: transitive
     description:
@@ -496,6 +504,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.1"
+  loading_overlay:
+    dependency: "direct main"
+    description:
+      name: loading_overlay
+      sha256: a4dd5a790e0d60568d4c684e46eed00de883db0dc660f90ffd583aca8f4a1d91
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.0"
   matcher:
     dependency: transitive
     description:

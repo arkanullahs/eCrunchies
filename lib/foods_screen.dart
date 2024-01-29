@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 //import 'food_details_screen.dart';
-//import 'food_model.dart';
+import 'food_model.dart';
 import 'food_details_screen.dart';
 import 'foods_screen.dart';
 

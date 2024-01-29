@@ -1,23 +1,8 @@
 import 'package:flutter/material.dart';
 import 'food_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'chat_screen.dart';
-
-class Food {
-  final String name;
-  final double price;
-  final String restaurantId; // Add this property
-  final String image;
-  final String description;
-
-  Food({
-    required this.name,
-    required this.price,
-    required this.restaurantId,
-    required this.image,
-    required this.description, required String restaurant,
-  });
-}
+import 'order_confirmation_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class FoodDetailsScreen extends StatefulWidget {
   final Food food;
@@ -35,26 +20,57 @@ class _FoodDetailsScreenState extends State<FoodDetailsScreen> {
   bool _isValid = true;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  String getCurrentUserEmail() {
+    return FirebaseAuth.instance.currentUser?.email ?? '';
+  }
+
   Future<void> sendOrderData(int quantity) async {
+    String userEmail = getCurrentUserEmail();
+    String restaurantName = widget.food.restaurant; // Assuming 'restaurant' is the correct property name
+
     Map<String, dynamic> orderData = {
       'foodName': widget.food.name,
       'price': widget.food.price,
       'quantity': quantity,
       'timeSent': FieldValue.serverTimestamp(),
-      'restaurantId':widget.food.restaurantId,
+      'restaurantId': widget.food.restaurantId,
+      'userEmail': userEmail,
+      'restaurantName': widget.food.restaurant,
+      'orderId': '', // Placeholder for orderId
     };
 
     try {
-      DocumentReference orderRef =
-      await _firestore.collection('orders').add(orderData);
+      DocumentReference orderRef = await _firestore.collection('orders').add(orderData);
       String orderId = orderRef.id;
+
+      // Update the orderId in orderData
+      orderData['orderId'] = orderId;
+
+      // Update the order document with orderId
+      await orderRef.update({'orderId': orderId});
+
+      // Create a message in 'order_chats' collection
+      DocumentReference chatMessageRef = await _firestore.collection('order_chats').add({
+        'orderId': orderId,
+        'messageContent': 'Your order has been placed!',
+        'sender': userEmail,
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+
+      // Retrieve the messageId and update the order with it
+      String messageId = chatMessageRef.id;
+      await orderRef.update({'messageId': messageId});
 
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => ChatScreen(
-            restaurantId: widget.food.restaurantId,
+          builder: (context) => OrderConfirmationPage(
             orderId: orderId,
+            food: widget.food,
+            quantity: quantity,
+            userEmail: userEmail,
+            restaurant: restaurantName,
+            messageId: messageId, // Pass the messageId to the OrderConfirmationPage
           ),
         ),
       );
@@ -62,6 +78,8 @@ class _FoodDetailsScreenState extends State<FoodDetailsScreen> {
       print('Error: $e');
     }
   }
+
+
 
   @override
   void dispose() {
@@ -162,20 +180,8 @@ class _FoodDetailsScreenState extends State<FoodDetailsScreen> {
                 child: ElevatedButton(
                   onPressed: _isValid
                       ? () async {
-                    int quantity =
-                        int.tryParse(_quantityController.text) ?? 0;
+                    int quantity = int.tryParse(_quantityController.text) ?? 0;
                     await sendOrderData(quantity);
-
-                    // Open the chat screen after placing the order
-                    /*Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ChatScreen(
-                          restaurantId: widget.food.restaurantId,
-                          orderId: '',
-                        ),
-                      ),
-                    );*/
                   }
                       : null,
                   style: ElevatedButton.styleFrom(

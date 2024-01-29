@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'signup_screen.dart' as signup;
 import 'user_type.dart' as userType;
 
@@ -44,19 +46,19 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
     super.dispose();
   }
 
-  Widget _buildUserTypeSelection() {
+  /*Widget _buildUserTypeSelection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text('Select User Type:'),
         Row(
           children: [
-            Radio(
+            /*Radio(
               value: userType.UserType.user,
               groupValue: _selectedUserType,
               onChanged: _onUserTypeChanged,
-            ),
-            Text('User'),
+            ),*/
+            //Text('User'),
             SizedBox(width: 20),
             Radio(
               value: userType.UserType.restaurantOwner,
@@ -68,7 +70,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
         ),
       ],
     );
-  }
+  }*/
 
   void _onUserTypeChanged(String? value) {
     setState(() {
@@ -90,16 +92,16 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
         password: _passwordController.text,
       );
 
-      setState(() {
-        _isLoginSuccessful = true;
-      });
-      _animationController.forward().then((value) {
-        if (_isRestaurantOwner()) {
-          Navigator.pushReplacementNamed(context, '/restaurantDashboard');
-        } else {
-          Navigator.pushReplacementNamed(context, '/orderScreen');
-        }
-      });
+      String detectedUserType = await _getUserType(userCredential.user?.uid);
+
+      if (detectedUserType == userType.UserType.user) {
+        Navigator.pushReplacementNamed(context, '/orderScreen');
+      } else if (detectedUserType == userType.UserType.restaurantOwner) {
+        Navigator.pushReplacementNamed(context, '/restaurantDashboard');
+      } else {
+        // Handle the case where the user type is neither 'user' nor 'restaurantOwner'
+        print('Invalid user type: $detectedUserType');
+      }
     } catch (e) {
       print('Login failed: $e');
       ScaffoldMessenger.of(context).showSnackBar(
@@ -114,6 +116,23 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
       _animationController.forward().then((value) {
         _animationController.reverse();
       });
+    }
+  }
+
+  Future<String> _getUserType(String? userId) async {
+    try {
+      DocumentSnapshot<Map<String, dynamic>> userTypesDoc =
+      await FirebaseFirestore.instance.collection('userTypes').doc(userId).get();
+
+      if (userTypesDoc.exists) {
+        return userTypesDoc.get('userType');
+      } else {
+        print('User type not found in database');
+        return ''; // Handle this case based on your requirements
+      }
+    } catch (e) {
+      print('Error getting user type: $e');
+      return ''; // Handle this case based on your requirements
     }
   }
 
@@ -164,6 +183,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
       },
     );
   }
+
 
   // Method-> password reset email
   void _sendPasswordResetEmail() async {
@@ -285,7 +305,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                   ),
                 ),
                 SizedBox(height: 16),
-                _buildUserTypeSelection(),
+                //_buildUserTypeSelection(),
                 //SizedBox(height: 32),
 
                 SizedBox(height: 16),
@@ -296,12 +316,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                   child: Text('Forgot Password?'),
                 ),
                 SizedBox(height: 16),
-                TextButton(
-                  onPressed: () {
-                    _goToSignupScreen();
-                  },
-                  child: Text('Sign Up'),
-                ),
+
               ],
             ),
           ),

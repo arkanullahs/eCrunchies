@@ -17,7 +17,6 @@ class ShowItems extends StatelessWidget {
 
           final items = snapshot.data!.docs;
 
-
           return ListView.builder(
             itemCount: items.length,
             itemBuilder: (context, index) {
@@ -26,18 +25,18 @@ class ShowItems extends StatelessWidget {
                   Dismissible(
                     key: Key(items[index].id),
                     direction: DismissDirection.endToStart,
-                    onDismissed: (direction) {
+                    onDismissed: (direction) async {
+                      // Show loading overlay while deleting
+                      showLoadingOverlay(context);
+
                       // Delete item from database
-                      FirebaseFirestore.instance
-                          .collection('items')
-                          .doc(items[index].id)
-                          .delete();
+                      await _deleteItem(items[index].id);
 
                       // Remove item from list
                       items.removeAt(index);
 
                       // Update the UI
-                      setState(() {});
+                      Navigator.of(context).pop(); // Dismiss loading overlay
                     },
                     background: Container(
                       color: Colors.red,
@@ -56,28 +55,31 @@ class ShowItems extends StatelessWidget {
                       ),
                       child: ListTile(
                         contentPadding: EdgeInsets.all(5),
-                        leading: Image.network(
-                          items[index]['imageUrl'],
+                        leading: FadeInImage(
+                          placeholder: AssetImage('assets/placeholder.png'), // Replace with your placeholder image
+                          image: NetworkImage(
+                            items[index]['imageUrl'],
+                          ),
                           height: 70,
                           width: 70,
                           fit: BoxFit.scaleDown,
-                          alignment: Alignment.center
+                          alignment: Alignment.center,
                         ),
                         title: Text(
                           items[index]['name'],
                           style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              fontStyle: FontStyle.italic,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            fontStyle: FontStyle.italic,
                           ),
                         ),
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            SizedBox(height:3),
+                            SizedBox(height: 3),
                             Text(
                               items[index]['description'],
-                              style: TextStyle(fontSize: 14,fontStyle:FontStyle.italic),
+                              style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic),
                               maxLines: 3,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -107,7 +109,6 @@ class ShowItems extends StatelessWidget {
                                 padding: EdgeInsets.zero, // and this
                               ),
                               child: Text('Read more'),
-
                             ),
                             Text(
                               '\$${items[index]['price']}',
@@ -118,7 +119,6 @@ class ShowItems extends StatelessWidget {
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-
                             SizedBox(width: 10),
                             IconButton(
                               onPressed: () {
@@ -140,29 +140,42 @@ class ShowItems extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Divider(height: 5,thickness: 0), // Divider between items
+                  Divider(height: 5, thickness: 0), // Divider between items
                 ],
               );
             },
           );
-
         },
       ),
     );
   }
 
-  Future<void> _deleteItem(BuildContext context, String documentId) async {
+  Future<void> _deleteItem(String documentId) async {
     try {
-      await FirebaseFirestore.instance
-          .collection('items')
-          .doc(documentId)
-          .delete();
+      await FirebaseFirestore.instance.collection('items').doc(documentId).delete();
     } catch (e) {
       print('Error deleting item: $e');
     }
   }
 
-  void setState(Null Function() param0) {}
+  void showLoadingOverlay(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(height: 16),
+              Text('Deleting Item...'),
+            ],
+          ),
+        );
+      },
+    );
+  }
 }
 
 class EditItemPage extends StatelessWidget {
@@ -174,7 +187,6 @@ class EditItemPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final nameController = TextEditingController(text: item['name']);
     final priceController = TextEditingController();
-    final imageUrlController = TextEditingController(text: item['imageUrl']);
     final descriptionController = TextEditingController(text: item['description']);
 
     return Scaffold(
@@ -207,24 +219,16 @@ class EditItemPage extends StatelessWidget {
               keyboardType: TextInputType.number,
             ),
             SizedBox(height: 20),
-            TextFormField(
-              controller: imageUrlController,
-              decoration: InputDecoration(
-                labelText: 'Image URL',
-              ),
-            ),
-            SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
+                // Show loading overlay while saving
+                showLoadingOverlay(context);
+
                 // Update item in Firestore
-                FirebaseFirestore.instance
-                    .collection('items')
-                    .doc(item.id)
-                    .update({
+                await FirebaseFirestore.instance.collection('items').doc(item.id).update({
                   'name': nameController.text,
                   'description': descriptionController.text,
                   'price': double.tryParse(priceController.text) ?? 0.0,
-                  'imageUrl': imageUrlController.text,
                 });
 
                 // Navigate back to show items page
@@ -235,6 +239,25 @@ class EditItemPage extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  void showLoadingOverlay(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(height: 16),
+              Text('Saving Changes...'),
+            ],
+          ),
+        );
+      },
     );
   }
 }

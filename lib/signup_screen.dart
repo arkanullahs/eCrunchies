@@ -1,22 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'login_screen.dart';
-import 'user_type.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:firebase_database/firebase_database.dart';
+//import 'user_type.dart' as userType;
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 
 class UserType {
   static const String user = 'User';
   static const String restaurantOwner = 'Restaurant Owner';
 }
 
-
-
 class SignupScreen extends StatefulWidget {
   final String userType;
-  //SignupScreen({this.userType});
+
   SignupScreen({required this.userType});
 
   @override
@@ -31,9 +26,6 @@ class _SignupScreenState extends State<SignupScreen> {
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  String _selectedUserType = UserType.user;
-
-
   Future<void> _signUp() async {
     try {
       UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
@@ -43,16 +35,19 @@ class _SignupScreenState extends State<SignupScreen> {
 
       await _storeUserData(
         userCredential.user?.uid,
-        _selectedUserType,
+        widget.userType,
         _fullNameController.text,
+        _emailController.text,
         _restaurantNameController.text,
+
       );
 
-      if (_selectedUserType == UserType.user) {
+      if (widget.userType == UserType.user) {
         Navigator.pushReplacementNamed(context, '/orderScreen');
-      } else if (_selectedUserType == UserType.restaurantOwner) {
+      } else if (widget.userType == UserType.restaurantOwner) {
         Navigator.pushReplacementNamed(context, '/restaurantDashboard');
       }
+
     } catch (e) {
       print('Sign up failed: $e');
       ScaffoldMessenger.of(context).showSnackBar(
@@ -63,55 +58,49 @@ class _SignupScreenState extends State<SignupScreen> {
       );
     }
   }
-  // Google Sign-In
-  Future<void> _signInWithGoogle() async {
+
+  /*Future<void> _storeUserData(String? userId, String userType, String fullName, [String? restaurantName]) async {
     try {
-      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-      final GoogleSignInAuthentication googleAuth = await googleUser!.authentication;
-      final AuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
+      // Use 'users' collection for both user types
+      await FirebaseFirestore.instance.collection('users').doc(userId).set({
+        'userType': userType,
+        'fullName': fullName,
+        if (userType == UserType.restaurantOwner) 'restaurantName': restaurantName,
+      });
 
-      await _auth.signInWithCredential(credential);
+      // Additional Logic: Set user type in Firestore document for differentiation during login
+      await FirebaseFirestore.instance.collection('userTypes').doc(userId).set({
+        'userType': userType,
+      });
 
-      // Handle user data storage and navigation
-      //_handleSocialMediaSignIn();
+      print('User data stored successfully : $userType');
     } catch (e) {
-      print('Google Sign-In failed: $e');
+      print('Error storing user data: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Google Sign-In failed. Please try again.'),
+          content: Text('Error storing user data. Please try again.'),
           duration: Duration(seconds: 3),
         ),
       );
     }
-  }
-
-  Future<void> _storeUserData(String? userId, String userType, String fullName, [String? restaurantName]) async {
+  }*/
+  Future<void> _storeUserData(String? userId, String userType, String fullName, String email, [String? restaurantName]) async {
     try {
-      DatabaseReference userRef = FirebaseDatabase.instance.reference().child('users').child(userId!);
-      userRef.set({
+      // Use 'users' collection for both user types
+      await FirebaseFirestore.instance.collection('users').doc(userId).set({
         'userType': userType,
         'fullName': fullName,
+        'email': email,
+        // Add email to the user document
         if (userType == UserType.restaurantOwner) 'restaurantName': restaurantName,
       });
 
-      await FirebaseFirestore.instance.collection('restaurantOwner').doc(userId).set({
+      // Additional Logic: Set user type in Firestore document for differentiation during login
+      await FirebaseFirestore.instance.collection('userTypes').doc(userId).set({
         'userType': userType,
-        'fullName': fullName,
-        if (userType == UserType.restaurantOwner) 'restaurantName': restaurantName,
       });
 
-      if (userType == UserType.restaurantOwner) {
-        await FirebaseFirestore.instance.collection('restaurant_owner').doc(userId).set({
-          'userType': userType,
-          'fullName': fullName,
-          'restaurantName': restaurantName,
-        });
-      }
-
-      print('User data stored successfully');
+      print('User data stored successfully : $userType,Name: $fullName,email: $email,restaurantName:$restaurantName');
     } catch (e) {
       print('Error storing user data: $e');
       ScaffoldMessenger.of(context).showSnackBar(
@@ -123,15 +112,9 @@ class _SignupScreenState extends State<SignupScreen> {
     }
   }
 
-  void _onUserTypeChanged(String? value) {
-    setState(() {
-      _selectedUserType = value ?? UserType.user;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
-    var _signInWithFacebook;
     return Scaffold(
       appBar: AppBar(
         title: Text('Sign Up'),
@@ -161,7 +144,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 ),
 
                 SizedBox(height: 16),
-                if (_selectedUserType == UserType.restaurantOwner)
+                if (widget.userType == UserType.restaurantOwner)
                   TextField(
                     controller: _restaurantNameController,
                     decoration: InputDecoration(
@@ -201,38 +184,6 @@ class _SignupScreenState extends State<SignupScreen> {
                   onPressed: _signUp,
                   child: Text('Sign Up'),
                 ),
-                // Social Media Login Buttons
-                ElevatedButton(
-                  onPressed: _signInWithGoogle,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Image.asset(
-                        'assets/google_logo.png', // Replace with your Google logo image path
-                        height: 20,
-                      ),
-                      SizedBox(width: 8),
-                      Text('Sign Up with Google'),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 8),
-                ElevatedButton(
-                  onPressed: _signInWithFacebook,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Image.asset(
-                        'assets/facebook_logo.png', // Replace with your Facebook logo image path
-                        height: 20,
-                      ),
-                      SizedBox(width: 8),
-                      Text('Sign Up with Facebook'),
-                    ],
-                  ),
-                ),
-
-
                 SizedBox(height: 16),
                 TextButton(
                   onPressed: () {
@@ -241,6 +192,10 @@ class _SignupScreenState extends State<SignupScreen> {
                       MaterialPageRoute(builder: (context) => LoginScreen(userType: '')),
                     );
                   },
+                  style: TextButton.styleFrom(
+                    primary: Colors.black,
+                    textStyle: TextStyle(fontSize: 16),
+                  ),
                   child: Text('Already have an account? Login'),
                 ),
               ],
@@ -251,10 +206,3 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 }
-
-  @override
-  Widget build(BuildContext context) {
-    // TODO: implement build
-    throw UnimplementedError();
-  }
-//}
