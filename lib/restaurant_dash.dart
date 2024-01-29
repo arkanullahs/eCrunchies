@@ -109,7 +109,7 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text('Enter Name, Price, and Description'),
+              title: Text('Enter Name, Price, and Description', style: TextStyle(fontSize: 18)),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
@@ -127,6 +127,9 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
                     decoration: InputDecoration(labelText: 'Description'),
                   ),
                 ],
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0), // Adjust the radius as needed
               ),
               actions: <Widget>[
                 ElevatedButton(
@@ -167,7 +170,7 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
 
                     Navigator.of(context).pop(); // Dismiss the dialog after adding the item
                   },
-                  child: Text('Add'),
+                  child: Text('Add', style: TextStyle(fontSize: 16)),
                   style: ElevatedButton.styleFrom(
                     primary: Colors.deepOrangeAccent,
                     elevation: 5,
@@ -178,6 +181,7 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
                 ),
               ],
             );
+
           },
         );
       } finally {
@@ -206,24 +210,24 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
   Widget build(BuildContext context) { return LoadingOverlay(
       isLoading: isLoading,
       child: Scaffold(
-      appBar: AppBar(
-        title: Text('Restaurant Dashboard'),
-      ),
+        appBar: AppBar(
+          title: Text('Restaurant Dashboard'),
+        ),
 
 
-      floatingActionButton: SpeedDial(
-        // Replaces the FloatingActionButton with a PopupMenuButton
-        //icon: Icons.add,
-        animatedIcon: AnimatedIcons.menu_arrow,
-        children: [
-      SpeedDialChild(
-      child: Icon(Icons.add_circle_outline),
-      label: 'Add New Item',
-      onTap: () async {
-        await addNewItem();
+        floatingActionButton: SpeedDial(
+          // Replaces the FloatingActionButton with a PopupMenuButton
+          //icon: Icons.add,
+          animatedIcon: AnimatedIcons.menu_arrow,
+          children: [
+            SpeedDialChild(
+                child: Icon(Icons.add_circle_outline),
+                label: 'Add New Item',
+                onTap: () async {
+                  await addNewItem();
 
-      } ),
-    /*SpeedDialChild(
+                } ),
+            /*SpeedDialChild(
             child: Icon(Icons.local_offer_outlined),
             label: 'Message',
             onTap: () async {
@@ -242,129 +246,129 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
               );
             },
           ),*/
-          SpeedDialChild(
-            child: Icon(Icons.message_rounded),
-            label: 'Messages',
-            onTap: () async {
-              // Fetch orderIds that match the restaurantName
-              QuerySnapshot<Map<String, dynamic>> ordersSnapshot = await FirebaseFirestore.instance
-                  .collection('orders')
-                  .where('restaurantName', isEqualTo: restaurantName)
-                  .get();
-              print(restaurantName);
+            SpeedDialChild(
+              child: Icon(Icons.message_rounded),
+              label: 'Messages',
+              onTap: () async {
+                // Fetch orderIds that match the restaurantName
+                QuerySnapshot<Map<String, dynamic>> ordersSnapshot = await FirebaseFirestore.instance
+                    .collection('orders')
+                    .where('restaurantName', isEqualTo: restaurantName)
+                    .get();
+                print(restaurantName);
 
-              List<String> orderIds = ordersSnapshot.docs.map((doc) => doc.id).toList();
+                List<String> orderIds = ordersSnapshot.docs.map((doc) => doc.id).toList();
 
-              // Show a dialog with a list of orderIds
-              await showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return FutureBuilder(
-                    future: Future.delayed(Duration(seconds: 2)), // Simulating a delay, replace it with your actual data fetching logic
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        // Return a loading indicator while data is being fetched
-                        return AlertDialog(
-                          content: Container(
-                            width: 5,
-                            height: 35,// Adjust the width as needed
-                            child: Center(
-                              child: CircularProgressIndicator(),
-                            ),
-                          ),
-                        );
-                      } else {
-                        // Data has been loaded, display the dialog
-                        return AlertDialog(
-                          title: Text('Select an Order'),
-                          content: Container(
-                            width: double.maxFinite,
-                            child: ListView.builder(
-                              itemCount: orderIds.length,
-                              itemBuilder: (context, index) {
-                                String orderId = orderIds[index];
-                                print("dummy:$orderId");
-                                return Column(
-                                  children: [
-                                    ListTile(
-                                      title: Text(
-                                        'Order ID: $orderId',
-                                        style: TextStyle(fontSize: 16),
-                                      ),
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => OrderChatScreen(
-                                              restaurantId: restaurantName,
-                                              orderId: orderId,
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                    Divider(
-                                      color: Colors.grey,
-                                      thickness: 1,
-                                    ),
-                                  ],
-                                );
-                              },
-                            ),
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16), // Adjust the radius as needed
-                          ),
-                          actions: <Widget>[
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: Text(
-                                'Cancel',
-                                style: TextStyle(
-                                  color: Colors.deepOrangeAccent,
-                                  fontSize: 16,
-                                ),
+                // Show a dialog with a list of orderIds
+                await showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return FutureBuilder(
+                      future: Future.delayed(Duration(seconds: 2)), // Simulating a delay, replace it with your actual data fetching logic
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          // Return a loading indicator while data is being fetched
+                          return AlertDialog(
+                            content: Container(
+                              width: 5,
+                              height: 35,// Adjust the width as needed
+                              child: Center(
+                                child: CircularProgressIndicator(),
                               ),
                             ),
-                          ],
-                        );
-                      }
-                    },
-                  );
-                },
-              );
-            },
-          ),
-
-
-        ],
-      ),
-    //);
- // }
-
-      body: Center(
-        child: Text('WELCOME $restaurantName'),
-      ),
-      bottomNavigationBar: BottomAppBar(
-        shape: CircularNotchedRectangle(),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            IconButton(
-              icon: Icon(Icons.show_chart_outlined),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ShowOrder().buildOrderList(context),
-                  ),
+                          );
+                        } else {
+                          // Data has been loaded, display the dialog
+                          return AlertDialog(
+                            title: Text('Select an Order'),
+                            content: Container(
+                              width: double.maxFinite,
+                              child: ListView.builder(
+                                itemCount: orderIds.length,
+                                itemBuilder: (context, index) {
+                                  String orderId = orderIds[index];
+                                  print("dummy:$orderId");
+                                  return Column(
+                                    children: [
+                                      ListTile(
+                                        title: Text(
+                                          'Order ID: $orderId',
+                                          style: TextStyle(fontSize: 16),
+                                        ),
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => OrderChatScreen(
+                                                restaurantId: restaurantName,
+                                                orderId: orderId,
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                      Divider(
+                                        color: Colors.grey,
+                                        thickness: 1,
+                                      ),
+                                    ],
+                                  );
+                                },
+                              ),
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16), // Adjust the radius as needed
+                            ),
+                            actions: <Widget>[
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: Text(
+                                  'Cancel',
+                                  style: TextStyle(
+                                    color: Colors.deepOrangeAccent,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        }
+                      },
+                    );
+                  },
                 );
               },
             ),
-            ///////////////////
-            /*IconButton(
+
+
+          ],
+        ),
+        //);
+        // }
+
+        body: Center(
+          child: Text('WELCOME $restaurantName'),
+        ),
+        bottomNavigationBar: BottomAppBar(
+          shape: CircularNotchedRectangle(),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              IconButton(
+                icon: Icon(Icons.show_chart_outlined),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ShowOrder().buildOrderList(context),
+                    ),
+                  );
+                },
+              ),
+              ///////////////////
+              /*IconButton(
               icon: Icon(Icons.message),
               onPressed: () {
                 Navigator.push(
@@ -375,21 +379,20 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
                 );
               },
             ),*/
-            IconButton(
-              icon: Icon(Icons.checklist),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => ShowItems()),
-                );
-              },
-            ),
-          ],
+              IconButton(
+                icon: Icon(Icons.checklist),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ShowItems()),
+                  );
+                },
+              ),
+            ],
+          ),
         ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-    )
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      )
   );
   }
 }
-

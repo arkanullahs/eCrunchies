@@ -316,12 +316,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                   child: Text('Forgot Password?'),
                 ),
                 SizedBox(height: 16),
-                TextButton(
-                  onPressed: () {
-                    _goToSignupScreen();
-                  },
-                  child: Text('Sign Up'),
-                ),
+
               ],
             ),
           ),

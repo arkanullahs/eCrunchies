@@ -9,9 +9,10 @@ class ShowOrder {
         title: Text(
           'Order List',
           style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              fontFamily: 'SF Pro Display'),
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            fontFamily: 'SF Pro Display',
+          ),
         ),
       ),
       body: StreamBuilder<QuerySnapshot>(
@@ -31,12 +32,27 @@ class ShowOrder {
               child: Text(
                 'No orders available.',
                 style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'SF Pro Display'),
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'SF Pro Display',
+                ),
               ),
             );
           }
+
+          // Assuming you want to display stats on the main page, fetch stats here
+          int totalOrders = orderData.length;
+          double totalAmount = orderData.fold(
+            0.0,
+                (previous, current) {
+              double price = current['price'] ?? 0.0;
+              int quantity = current['quantity'] ?? 1;
+              return previous + (price * quantity);
+            },
+          );
+
+          // Now, you can use these stats in the main page
+          // ...
 
           return ListView.builder(
             itemCount: orderData.length,
@@ -57,9 +73,10 @@ class ShowOrder {
                   title: Text(
                     'Food: $foodName',
                     style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'SF Pro Display'),
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'SF Pro Display',
+                    ),
                   ),
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -67,17 +84,23 @@ class ShowOrder {
                       Text(
                         'Quantity: $quantity',
                         style: TextStyle(
-                            fontSize: 16, fontFamily: 'SF Pro Display'),
+                          fontSize: 16,
+                          fontFamily: 'SF Pro Display',
+                        ),
                       ),
                       Text(
                         'Price: $price',
                         style: TextStyle(
-                            fontSize: 16, fontFamily: 'SF Pro Display'),
+                          fontSize: 16,
+                          fontFamily: 'SF Pro Display',
+                        ),
                       ),
                       Text(
                         'Time Sent: ${_formatDateTime(timeSent)}',
                         style: TextStyle(
-                            fontSize: 16, fontFamily: 'SF Pro Display'),
+                          fontSize: 16,
+                          fontFamily: 'SF Pro Display',
+                        ),
                       ),
                     ],
                   ),
@@ -92,5 +115,26 @@ class ShowOrder {
 
   String _formatDateTime(DateTime dateTime) {
     return '${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour}:${dateTime.minute}';
+  }
+
+  // New method to fetch statistics
+  Future<Map<String, dynamic>> fetchOrderStatistics() async {
+    QuerySnapshot<Map<String, dynamic>> querySnapshot =
+    await FirebaseFirestore.instance.collection('orders').get();
+
+    int totalOrders = querySnapshot.docs.length;
+    double totalAmount = querySnapshot.docs.fold(
+      0.0,
+          (previous, current) {
+        double price = current['price'] ?? 0.0;
+        int quantity = current['quantity'] ?? 1;
+        return previous + (price * quantity);
+      },
+    );
+
+    return {
+      'totalOrders': totalOrders,
+      'totalAmount': totalAmount,
+    };
   }
 }
