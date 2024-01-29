@@ -7,6 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'order_chat_screen.dart';
 import 'restaurant_dash_show_items.dart';
 import 'restaurant_dash_show_order_list.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 //import 'add_offer_page.dart'; // Import the AddOfferPage
 import 'chat_screen.dart'; // Import your chat screen
 
@@ -25,14 +26,18 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
   final nameController2 = TextEditingController();
   final priceController2 = TextEditingController();
   final descriptionController2 = TextEditingController();
-  int val=0;
+  int val = 0;
 
   int itemCount = 0; // To maintain the count of items
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  late String restaurantName = '';
+  late List<String> orderIds = [];
 
   Future<void> fetchItemCount() async {
     QuerySnapshot<Map<String, dynamic>> querySnapshot =
     await FirebaseFirestore.instance.collection('items').get();
-
     setState(() {
       itemCount = querySnapshot.docs.length;
     });
@@ -41,7 +46,40 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
   @override
   void initState() {
     super.initState();
+    fetchRestaurantNameAndOrderIds();
     fetchItemCount(); // Fetch the current item count on initialization
+  }
+
+  Future<void> fetchRestaurantNameAndOrderIds() async {
+    await fetchRestaurantName();
+    await fetchOrderIds();
+  }
+
+  Future<void> fetchRestaurantName() async {
+    User? user = _auth.currentUser;
+
+    if (user != null) {
+      String userEmail = user.email ?? '';
+
+      QuerySnapshot<Map<String, dynamic>> querySnapshot =
+      await _firestore.collection('users').where('email', isEqualTo: userEmail).get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        setState(() {
+          restaurantName = querySnapshot.docs.first.get('restaurantName');
+        });
+      }
+    }
+    print(restaurantName);
+  }
+
+  Future<void> fetchOrderIds() async {
+    QuerySnapshot<Map<String, dynamic>> querySnapshot =
+    await _firestore.collection('orders').where('restaurant', isEqualTo: restaurantName).get();
+
+    setState(() {
+      orderIds = querySnapshot.docs.map((doc) => doc.id).toList();
+    });
   }
 
   Future<void> addNewItem() async {
@@ -157,32 +195,74 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
 
       } ),
 
-      SpeedDialChild(
-      child: Icon(Icons.local_offer_outlined),
-      label: 'Add Offer',
-          onTap: () async {
-            //await addNewOffer();
+          SpeedDialChild(
+            child: Icon(Icons.local_offer_outlined),
+            label: 'Add Offer',
+            onTap: () async {
+              // Fetch orderIds that match the restaurantName
+              QuerySnapshot<Map<String, dynamic>> ordersSnapshot = await FirebaseFirestore.instance
+                  .collection('orders')
+                  .where('restaurant', isEqualTo: restaurantName)
+                  .get();
+              print(restaurantName);
 
-          }  ),
+              List<String> orderIds = ordersSnapshot.docs.map((doc) => doc.id).toList();
+
+              // Show a dialog with a list of orderIds
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: Text('Select an Order'),
+                    content: Container(
+                      width: double.maxFinite,
+                      child: ListView.builder(
+                        itemCount: orderIds.length,
+                        itemBuilder: (context, index) {
+                          String orderId = orderIds[index];
+                          return ListTile(
+                            title: Text('Order ID: $orderId'),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => OrderChatScreen(
+                                    restaurantId: restaurantName,
+                                    orderId: orderId,
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+
           SpeedDialChild(
             child: Icon(Icons.message),
             label: 'Message',
             onTap: () async {
               // Fetch the current user's email
-              String userEmail = 'user0@gmail.com'; // Replace with actual user email retrieval logic
+              //String userEmail = 'user0@gmail.com'; // Replace with actual user email retrieval logic
 
               // Open the chat screen for the current user's email
               Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => OrderChatScreen(
-                    restaurantId: userEmail, // Use the user's email as the restaurant ID
-                    orderId: 'ibHKQThEN5BpoL8bwwpC', // You can provide an order ID if needed
+                    restaurantId: restaurantName, // Use the user's email as the restaurant ID
+                    orderId: orderIds.first, // You can provide an order ID if needed
                   ),
                 ),
               );
             },
           ),
+
 
         ],
       ),
@@ -190,7 +270,7 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
  // }
 
       body: Center(
-        child: Text('WELCOME restaurantOwner'),
+        child: Text('WELCOME $restaurantName'),
       ),
       bottomNavigationBar: BottomAppBar(
         shape: CircularNotchedRectangle(),

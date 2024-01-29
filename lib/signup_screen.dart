@@ -37,7 +37,9 @@ class _SignupScreenState extends State<SignupScreen> {
         userCredential.user?.uid,
         widget.userType,
         _fullNameController.text,
+        _emailController.text,
         _restaurantNameController.text,
+
       );
 
       if (widget.userType == UserType.user) {
@@ -57,7 +59,7 @@ class _SignupScreenState extends State<SignupScreen> {
     }
   }
 
-  Future<void> _storeUserData(String? userId, String userType, String fullName, [String? restaurantName]) async {
+  /*Future<void> _storeUserData(String? userId, String userType, String fullName, [String? restaurantName]) async {
     try {
       // Use 'users' collection for both user types
       await FirebaseFirestore.instance.collection('users').doc(userId).set({
@@ -81,7 +83,35 @@ class _SignupScreenState extends State<SignupScreen> {
         ),
       );
     }
+  }*/
+  Future<void> _storeUserData(String? userId, String userType, String fullName, String email, [String? restaurantName]) async {
+    try {
+      // Use 'users' collection for both user types
+      await FirebaseFirestore.instance.collection('users').doc(userId).set({
+        'userType': userType,
+        'fullName': fullName,
+        'email': email,
+        // Add email to the user document
+        if (userType == UserType.restaurantOwner) 'restaurantName': restaurantName,
+      });
+
+      // Additional Logic: Set user type in Firestore document for differentiation during login
+      await FirebaseFirestore.instance.collection('userTypes').doc(userId).set({
+        'userType': userType,
+      });
+
+      print('User data stored successfully : $userType,Name: $fullName,email: $email,restaurantName:$restaurantName');
+    } catch (e) {
+      print('Error storing user data: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error storing user data. Please try again.'),
+          duration: Duration(seconds: 3),
+        ),
+      );
+    }
   }
+
 
   @override
   Widget build(BuildContext context) {
