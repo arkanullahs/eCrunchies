@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'login_screen.dart';
-//import 'user_type.dart' as userType;
+import 'user_type.dart' as userType;
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class UserType {
@@ -25,8 +25,13 @@ class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController _restaurantNameController = TextEditingController();
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  bool _isLoading = false;
 
   Future<void> _signUp() async {
+    setState(() {
+      _isLoading = true;
+    });
+
     try {
       UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
         email: _emailController.text,
@@ -39,7 +44,6 @@ class _SignupScreenState extends State<SignupScreen> {
         _fullNameController.text,
         _emailController.text,
         _restaurantNameController.text,
-
       );
 
       if (widget.userType == UserType.user) {
@@ -47,7 +51,6 @@ class _SignupScreenState extends State<SignupScreen> {
       } else if (widget.userType == UserType.restaurantOwner) {
         Navigator.pushReplacementNamed(context, '/restaurantDashboard');
       }
-
     } catch (e) {
       print('Sign up failed: $e');
       ScaffoldMessenger.of(context).showSnackBar(
@@ -56,51 +59,28 @@ class _SignupScreenState extends State<SignupScreen> {
           duration: Duration(seconds: 3),
         ),
       );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
-  /*Future<void> _storeUserData(String? userId, String userType, String fullName, [String? restaurantName]) async {
+  Future<void> _storeUserData(String? userId, String userType, String fullName, String email,
+      [String? restaurantName]) async {
     try {
-      // Use 'users' collection for both user types
-      await FirebaseFirestore.instance.collection('users').doc(userId).set({
-        'userType': userType,
-        'fullName': fullName,
-        if (userType == UserType.restaurantOwner) 'restaurantName': restaurantName,
-      });
-
-      // Additional Logic: Set user type in Firestore document for differentiation during login
-      await FirebaseFirestore.instance.collection('userTypes').doc(userId).set({
-        'userType': userType,
-      });
-
-      print('User data stored successfully : $userType');
-    } catch (e) {
-      print('Error storing user data: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error storing user data. Please try again.'),
-          duration: Duration(seconds: 3),
-        ),
-      );
-    }
-  }*/
-  Future<void> _storeUserData(String? userId, String userType, String fullName, String email, [String? restaurantName]) async {
-    try {
-      // Use 'users' collection for both user types
       await FirebaseFirestore.instance.collection('users').doc(userId).set({
         'userType': userType,
         'fullName': fullName,
         'email': email,
-        // Add email to the user document
         if (userType == UserType.restaurantOwner) 'restaurantName': restaurantName,
       });
 
-      // Additional Logic: Set user type in Firestore document for differentiation during login
       await FirebaseFirestore.instance.collection('userTypes').doc(userId).set({
         'userType': userType,
       });
 
-      print('User data stored successfully : $userType,Name: $fullName,email: $email,restaurantName:$restaurantName');
+      print('User data stored successfully : $userType, Name: $fullName, email: $email, restaurantName: $restaurantName');
     } catch (e) {
       print('Error storing user data: $e');
       ScaffoldMessenger.of(context).showSnackBar(
@@ -112,10 +92,10 @@ class _SignupScreenState extends State<SignupScreen> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xFFF9EBDC),
       appBar: AppBar(
         title: Text('Sign Up'),
       ),
@@ -142,7 +122,6 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
                   ),
                 ),
-
                 SizedBox(height: 16),
                 if (widget.userType == UserType.restaurantOwner)
                   TextField(
@@ -181,8 +160,23 @@ class _SignupScreenState extends State<SignupScreen> {
                 SizedBox(height: 16),
                 SizedBox(height: 32),
                 ElevatedButton(
-                  onPressed: _signUp,
-                  child: Text('Sign Up'),
+                  onPressed: _isLoading ? null : _signUp,
+                  style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
+                    elevation: 3,
+                  ),
+                  child: _isLoading
+                      ? CircularProgressIndicator()
+                      : Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.arrow_forward_ios_outlined),
+                      SizedBox(width: 0),
+                    ],
+                  ),
                 ),
                 SizedBox(height: 16),
                 TextButton(
