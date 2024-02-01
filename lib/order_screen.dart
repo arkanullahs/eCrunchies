@@ -18,6 +18,7 @@ class _OrderScreenState extends State<OrderScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      //backgroundColor: Color(0xFFF9EBDC),
       appBar: AppBar(
         title: Text('Explore Restaurants'),
         actions: [

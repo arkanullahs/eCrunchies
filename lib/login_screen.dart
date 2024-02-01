@@ -25,6 +25,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
   late AnimationController _animationController;
   late Animation<double> _animation;
   bool _isLoginSuccessful = false;
+  bool _isLoggingIn = false;
 
   @override
   void initState() {
@@ -40,37 +41,12 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
       ),
     );
   }
+
   @override
   void dispose() {
     _animationController.dispose();
     super.dispose();
   }
-
-  /*Widget _buildUserTypeSelection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Select User Type:'),
-        Row(
-          children: [
-            /*Radio(
-              value: userType.UserType.user,
-              groupValue: _selectedUserType,
-              onChanged: _onUserTypeChanged,
-            ),*/
-            //Text('User'),
-            SizedBox(width: 20),
-            Radio(
-              value: userType.UserType.restaurantOwner,
-              groupValue: _selectedUserType,
-              onChanged: _onUserTypeChanged,
-            ),
-            Text('Restaurant Owner'),
-          ],
-        ),
-      ],
-    );
-  }*/
 
   void _onUserTypeChanged(String? value) {
     setState(() {
@@ -85,8 +61,22 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
     });
   }
 
+  void _startLogin() {
+    setState(() {
+      _isLoggingIn = true;
+    });
+  }
+
+  void _stopLogin() {
+    setState(() {
+      _isLoggingIn = false;
+    });
+  }
+
   void _login() async {
     try {
+      _startLogin(); // Start loading indicator
+
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
         email: _emailController.text,
         password: _passwordController.text,
@@ -116,6 +106,8 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
       _animationController.forward().then((value) {
         _animationController.reverse();
       });
+    } finally {
+      _stopLogin(); // Stop loading indicator regardless of success or failure
     }
   }
 
@@ -140,7 +132,6 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
     return _selectedUserType == userType.UserType.restaurantOwner;
   }
 
-  // Method -> Forgot Password
   Future<void> _showForgotPasswordDialog() async {
     return showDialog<void>(
       context: context,
@@ -184,13 +175,10 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
     );
   }
 
-
-  // Method-> password reset email
   void _sendPasswordResetEmail() async {
     try {
       await _auth.sendPasswordResetEmail(email: _emailController.text);
 
-      // Display a message
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -236,6 +224,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xFFF9EBDC),
       appBar: AppBar(
         title: Text('Login'),
       ),
@@ -276,37 +265,40 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                 ),
                 SizedBox(height: 32),
                 GestureDetector(
-                  onTap: _isPasswordIncorrect ? null : _login,
-                  child: AnimatedBuilder(
-                    animation: _animationController,
-                    builder: (context, child) {
-                      return Container(
-                        width: double.infinity,
-                        height: 50,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(_animation.value),
-                          color: _isLoginSuccessful
-                              ? Colors.green
-                              : _isPasswordIncorrect
-                              ? Colors.red
-                              : (_isPasswordInputting ? Theme.of(context).primaryColor : Colors.grey),
-                        ),
-                        child: Center(
-                          child: _isLoginSuccessful
-                              ? Icon(Icons.check, color: Colors.white)
-                              : _isPasswordIncorrect
-                              ? Icon(Icons.close, color: Colors.white)
-                              : (_isPasswordInputting
-                              ? Icon(Icons.arrow_forward, color: Colors.white)
-                              : Icon(Icons.arrow_forward, color: Colors.white)),
-                        ),
-                      );
-                    },
+                  onTap: _isPasswordIncorrect || _isLoggingIn ? null : _login,
+                  child: Container(
+                    width: double.infinity,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(_animation.value),
+                      color: _isLoginSuccessful
+                          ? Colors.green
+                          : _isPasswordIncorrect
+                          ? Colors.red
+                          : (_isPasswordInputting ? Theme.of(context).primaryColor : Colors.grey),
+                    ),
+                    child: Center(
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          if (!_isLoggingIn) // Only show arrow when not logging in
+                            _isLoginSuccessful
+                                ? Icon(Icons.check, color: Colors.white)
+                                : _isPasswordIncorrect
+                                ? Icon(Icons.close, color: Colors.white)
+                                : Icon(Icons.arrow_forward, color: Colors.white),
+                          if (_isLoggingIn)
+                            CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                            ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
-                SizedBox(height: 16),
-                //_buildUserTypeSelection(),
-                //SizedBox(height: 32),
+
+
+
 
                 SizedBox(height: 16),
                 TextButton(
@@ -316,7 +308,6 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                   child: Text('Forgot Password?'),
                 ),
                 SizedBox(height: 16),
-
               ],
             ),
           ),
@@ -324,6 +315,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
       ),
     );
   }
+
   void _goToSignupScreen() {
     Navigator.push(
       context,

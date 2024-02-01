@@ -9,7 +9,7 @@ import 'restaurant_dash_show_items.dart';
 import 'restaurant_dash_show_order_list.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 //import 'add_offer_page.dart'; // Import the AddOfferPage
-import 'chat_screen.dart'; // Import your chat screen
+//import 'chat_screen.dart'; // Import your chat screen
 import 'package:loading_overlay/loading_overlay.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
