@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'food_model.dart';
-import 'chat_screen.dart';
+//import 'chat_screen.dart';
 import 'order_chat_screen.dart';
 import 'food_details_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';

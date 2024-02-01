@@ -50,6 +50,7 @@ dependencies:
   syncfusion_flutter_charts: ^24.1.44+1
   loading_overlay:
   fluttertoast:
+  flutter_launcher_icons: ^0.13.1
 
 dev_dependencies:
   flutter_test:
