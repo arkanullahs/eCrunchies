@@ -1,11 +1,12 @@
-
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'food_details_screen.dart';
 import 'food_items_screen.dart';
 import 'discover_screen.dart';
 import 'foods_screen.dart';
 import 'restaurant_menu_screen.dart';
+import 'order_chat_screen.dart';
 
 class OrderScreen extends StatefulWidget {
   @override
@@ -18,7 +19,6 @@ class _OrderScreenState extends State<OrderScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      //backgroundColor: Color(0xFFF9EBDC),
       appBar: AppBar(
         title: Text('Explore Restaurants'),
         actions: [
@@ -26,7 +26,7 @@ class _OrderScreenState extends State<OrderScreen> {
             onTap: () {
               showSearch(
                 context: context,
-                delegate: RestaurantSearchDelegate(), // Use custom search delegate
+                delegate: RestaurantSearchDelegate(),
               );
             },
             child: Padding(
@@ -39,12 +39,12 @@ class _OrderScreenState extends State<OrderScreen> {
           ),
           GestureDetector(
             onTap: () {
-              Navigator.pushReplacementNamed(context, '/'); // Navigate to login screen
+              Navigator.pushReplacementNamed(context, '/');
             },
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Icon(
-                Icons.logout, // Use a logout icon here
+                Icons.logout,
                 size: 32,
               ),
             ),
@@ -56,7 +56,7 @@ class _OrderScreenState extends State<OrderScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(height: 10),
-            FoodsScreen(), // Food page view
+            FoodsScreen(),
             SizedBox(height: 12),
             Padding(
               padding: const EdgeInsets.all(16.0),
@@ -64,7 +64,7 @@ class _OrderScreenState extends State<OrderScreen> {
                 'Items',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: 18,
+                  fontSize: 24,
                 ),
               ),
             ),
@@ -73,8 +73,104 @@ class _OrderScreenState extends State<OrderScreen> {
           ],
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          _showMessages();
+        },
+        tooltip: 'Show Messages',
+        child:
+        Icon(Icons.message),
+      ),
     );
   }
+
+  void _showMessages() async {
+    String currentUserEmail = FirebaseAuth.instance.currentUser?.email ?? '';
+    CollectionReference orderChatsCollection =
+    FirebaseFirestore.instance.collection('order_chats');
+
+    try {
+      QuerySnapshot<Map<String, dynamic>> querySnapshot =
+      await orderChatsCollection
+          .where('sender', isEqualTo: currentUserEmail)
+          .get() as QuerySnapshot<Map<String, dynamic>>;
+
+      List<String> orderIds = [];
+
+      for (QueryDocumentSnapshot<Map<String, dynamic>> document
+      in querySnapshot.docs) {
+        String orderId = document['orderId'];
+        orderIds.add(orderId);
+      }
+
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Select an Order'),
+            content: Container(
+              width: double.maxFinite,
+              child: ListView.builder(
+                itemCount: orderIds.length,
+                itemBuilder: (context, index) {
+                  String orderId = orderIds[index];
+
+                  return Column(
+                    children: [
+                      ListTile(
+                        title: Text(
+                          'Order ID: $orderId',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => OrderChatScreen(
+                                restaurantId: '', // Provide the restaurant ID here
+                                orderId: orderId,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      Divider(
+                        color: Colors.grey,
+                        thickness: 1,
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text(
+                  'Cancel',
+                  style: TextStyle(
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      );
+    } catch (error) {
+      print('Error fetching order chats: $error');
+    }
+  }
+
+
+
+
+
 }
 
 class RestaurantSearchDelegate extends SearchDelegate<String> {
@@ -119,7 +215,8 @@ class SearchResults extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance.collection('restaurants')
+      stream: FirebaseFirestore.instance
+          .collection('restaurants')
           .where('name', isGreaterThanOrEqualTo: searchQuery)
           .where('name', isLessThan: searchQuery + 'z')
           .snapshots(),

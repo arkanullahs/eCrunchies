@@ -1,3 +1,4 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'food_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -19,6 +20,10 @@ class _FoodDetailsScreenState extends State<FoodDetailsScreen> {
   final TextEditingController _quantityController = TextEditingController();
   bool _isValid = true;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  get foodName => widget.food.name;
+
+  get restaurantName =>  widget.food.restaurant;
 
   String getCurrentUserEmail() {
     return FirebaseAuth.instance.currentUser?.email ?? '';
@@ -107,14 +112,14 @@ class _FoodDetailsScreenState extends State<FoodDetailsScreen> {
                     image: NetworkImage(widget.food.image),
                     fit: BoxFit.contain,
                   ),
-                  boxShadow: [
+                  /*boxShadow: [
                     BoxShadow(
                       color: Colors.grey.withOpacity(0.25),
                       spreadRadius: 6,
                       blurRadius: 50,
                       offset: Offset(0, 8),
                     ),
-                  ],
+                  ],*/
                 ),
               ),
               SizedBox(height: 20),
@@ -122,9 +127,9 @@ class _FoodDetailsScreenState extends State<FoodDetailsScreen> {
                 widget.food.name,
                 style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
               ),
-              SizedBox(height: 10),
+              SizedBox(height: 1),
               Text(
-                '\$${widget.food.price}',
+                '৳${widget.food.price}',
                 style: TextStyle(fontSize: 22, color: Colors.redAccent),
               ),
               SizedBox(height: 10),
@@ -180,13 +185,23 @@ class _FoodDetailsScreenState extends State<FoodDetailsScreen> {
                 child: ElevatedButton(
                   onPressed: _isValid
                       ? () async {
+
                     int quantity = int.tryParse(_quantityController.text) ?? 0;
                     await sendOrderData(quantity);
+
+                    AwesomeNotifications().createNotification(
+                      content: NotificationContent(
+                          id: 1,
+                          channelKey: "basic_channel",
+                          title: "Your order has been successfully placed!",
+                          body: 'YUMM,You have ordered $quantity $foodName from $restaurantName.',
+                      ),
+                    );
                   }
                       : null,
                   style: ElevatedButton.styleFrom(
                     padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16),
-                    primary: Colors.deepOrangeAccent,
+                    //primary: Colors.deepOrangeAccent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30.0),
                     ),

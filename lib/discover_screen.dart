@@ -1,8 +1,5 @@
-
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'food_details_screen.dart';
-import 'food_model.dart';
 import 'FullRestaurantList.dart';
 import 'restaurant_menu_screen.dart';
 
@@ -130,28 +127,53 @@ class RestaurantCard extends StatelessWidget {
       margin: EdgeInsets.symmetric(horizontal: 8),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15),
-        image: DecorationImage(
-          image: NetworkImage(imageUrl),
-          fit: BoxFit.cover,
-        ),
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
+      child: Stack(
         children: [
-          Container(
-            padding: EdgeInsets.all(8),
-            color: Colors.black.withOpacity(0.5),
-            child: Text(
-              name,
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
+          Positioned.fill(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(15),
+              child: Image.network(
+                imageUrl,
+                fit: BoxFit.cover,
+                loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                  if (loadingProgress == null) {
+                    return child;
+                  } else {
+                    return Center(
+                      child: CircularProgressIndicator(
+                        value: loadingProgress.expectedTotalBytes != null
+                            ? loadingProgress.cumulativeBytesLoaded / (loadingProgress.expectedTotalBytes ?? 1)
+                            : null,
+                      ),
+                    );
+                  }
+                },
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 14,
+            left: 0,
+            right: 0,
+            child: Container(
+              padding: EdgeInsets.all(0),
+              color: Colors.black.withOpacity(.2),
+              child: Text(
+                textAlign:TextAlign.center,
+                name,
+                style: TextStyle(
+
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
         ],
       ),
     );
+
   }
 }
 

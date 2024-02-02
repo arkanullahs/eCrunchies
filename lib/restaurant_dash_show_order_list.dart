@@ -64,10 +64,10 @@ class ShowOrder {
               (orderData[index]['timeSent'] as Timestamp).toDate();
 
               return Card(
-                elevation: 5,
-                margin: EdgeInsets.all(10),
+                elevation: 2,
+                margin: EdgeInsets.all(7),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(8),
                 ),
                 child: ListTile(
                   title: Text(

@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-//import 'food_details_screen.dart';
-import 'food_model.dart';
-import 'food_details_screen.dart';
-import 'foods_screen.dart';
+import 'restaurant_menu_screen.dart';
+
 
 
 class FoodsScreen extends StatelessWidget {
@@ -46,17 +44,8 @@ class FoodsScreen extends StatelessWidget {
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(
-                            builder: (context) => FoodDetailsScreen(
-                              food: Food(
-                                restaurant: restaurant,
-                                name: name,
-                                price: price,
-                                image: imageUrl,
-                                description: 'Will Fix That Later-Saad', restaurantId: '',
-                              ),
-                            ),
-                          ),
+                            MaterialPageRoute(
+                            builder: (context) => RestaurantMenuScreen(restaurantName: restaurant),)
                         );
                       },
                       child: Card(
@@ -71,9 +60,19 @@ class FoodsScreen extends StatelessWidget {
                           child: Image.network(
                             imageUrl,
                             fit: BoxFit.cover,
+                            loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                              if (loadingProgress == null) {
+                                return child; // If the image is fully loaded, display it
+                              } else {
+                                return Center(
+                                  child: CircularProgressIndicator(), // Display a loading indicator while the image is loading
+                                );
+                              }
+                            },
                           ),
                         ),
                       ),
+
                     );
                   },
                 );

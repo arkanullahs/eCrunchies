@@ -86,43 +86,45 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage>
               ),
               SizedBox(height: 30),
               Card(
-                elevation: 8, // Increased elevation for a more modern look
+                elevation: 5,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15.0),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(20.0),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
                         'Order Details',
                         style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 22,
+                          fontWeight: FontWeight.w900,
                           color: Theme.of(context).colorScheme.primary,
                         ),
                       ),
-                      SizedBox(height: 10),
+                      SizedBox(height: 5),
                       Text('Food: ${widget.food.name}'),
                       SizedBox(height: 10),
-                      Image.network(
-                        widget.food.image,
-                        height: 100,
-                        width: 100,
-                        fit: BoxFit.cover,
+                      Container(
+                        height: 180,
+                        width: 180,
+                        child: Image.network(
+                          widget.food.image,
+                          fit: BoxFit.cover,
+                        ),
                       ),
                       SizedBox(height: 10),
                       Text('Quantity: ${widget.quantity}'),
                       SizedBox(height: 10),
                       Text(
-                        'Total Price: \$${(widget.food.price * widget.quantity).toStringAsFixed(2)}',
+                        'Total Price: ৳${(widget.food.price * widget.quantity).toStringAsFixed(2)}',
                       ),
                     ],
                   ),
                 ),
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 50),
               ScaleTransition(
                 scale: Tween<double>(begin: 0, end: 1).animate(
                   CurvedAnimation(
@@ -132,15 +134,10 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage>
                 ),
                 child: ElevatedButton(
                   onPressed: () {
-
-
                     Navigator.push(
-
                       context,
                       MaterialPageRoute(
-
                         builder: (context) => OrderChatScreen(
-
                           restaurantId: widget.food.restaurantId,
                           orderId: widget.orderId,
                         ),
@@ -148,8 +145,7 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage>
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: Theme.of(context).colorScheme.primary,
-                    elevation: 10, // Increased elevation for a more prominent button
+                    elevation: 5,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30.0),
                     ),
@@ -162,11 +158,11 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage>
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.chat_bubble, size: 30),
+                        Icon(Icons.chat_bubble, size: 25),
                         SizedBox(width: 10),
                         Text(
                           'Chat with Restaurant',
-                          style: TextStyle(fontSize: 18),
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
