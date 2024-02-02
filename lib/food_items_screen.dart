@@ -68,14 +68,22 @@ class FoodItemsScreen extends StatelessWidget {
                         margin: EdgeInsets.symmetric(horizontal: 8),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(15),
-                          image: DecorationImage(
-                            image: NetworkImage(imageUrl), // Use network image
-                            fit: BoxFit.contain,
-                          ),
                         ),
-
-
+                        child: Image.network(
+                          imageUrl,
+                          fit: BoxFit.contain,
+                          loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                            if (loadingProgress == null) {
+                              return child; // If the image is fully loaded, display it
+                            } else {
+                              return Center(
+                                child: CircularProgressIndicator(), // Display a loading indicator while the image is loading
+                              );
+                            }
+                          },
+                        ),
                       ),
+
 
 
                     );

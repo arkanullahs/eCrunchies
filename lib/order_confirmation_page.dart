@@ -86,7 +86,7 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage>
               ),
               SizedBox(height: 30),
               Card(
-                elevation: 5, // Increased elevation for a more modern look
+                elevation: 5,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15.0),
                 ),
@@ -106,17 +106,19 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage>
                       SizedBox(height: 5),
                       Text('Food: ${widget.food.name}'),
                       SizedBox(height: 10),
-                      Image.network(
-                        widget.food.image,
+                      Container(
                         height: 180,
                         width: 180,
-                        fit: BoxFit.cover,
+                        child: Image.network(
+                          widget.food.image,
+                          fit: BoxFit.cover,
+                        ),
                       ),
                       SizedBox(height: 10),
                       Text('Quantity: ${widget.quantity}'),
                       SizedBox(height: 10),
                       Text(
-                        'Total Price: \$${(widget.food.price * widget.quantity).toStringAsFixed(2)}',
+                        'Total Price: ৳${(widget.food.price * widget.quantity).toStringAsFixed(2)}',
                       ),
                     ],
                   ),
@@ -143,8 +145,7 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage>
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    //primary: Theme.of(context).colorScheme.primary,
-                    elevation: 5, // Increased elevation for a more prominent button
+                    elevation: 5,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30.0),
                     ),
@@ -161,7 +162,7 @@ class _OrderConfirmationPageState extends State<OrderConfirmationPage>
                         SizedBox(width: 10),
                         Text(
                           'Chat with Restaurant',
-                          style: TextStyle(fontSize: 18,fontWeight: FontWeight.bold),
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),

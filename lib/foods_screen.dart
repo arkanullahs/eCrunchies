@@ -71,9 +71,19 @@ class FoodsScreen extends StatelessWidget {
                           child: Image.network(
                             imageUrl,
                             fit: BoxFit.cover,
+                            loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                              if (loadingProgress == null) {
+                                return child; // If the image is fully loaded, display it
+                              } else {
+                                return Center(
+                                  child: CircularProgressIndicator(), // Display a loading indicator while the image is loading
+                                );
+                              }
+                            },
                           ),
                         ),
                       ),
+
                     );
                   },
                 );

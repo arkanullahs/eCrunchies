@@ -23,6 +23,8 @@ class _FoodDetailsScreenState extends State<FoodDetailsScreen> {
 
   get foodName => widget.food.name;
 
+  get restaurantName =>  widget.food.restaurant;
+
   String getCurrentUserEmail() {
     return FirebaseAuth.instance.currentUser?.email ?? '';
   }
@@ -127,7 +129,7 @@ class _FoodDetailsScreenState extends State<FoodDetailsScreen> {
               ),
               SizedBox(height: 1),
               Text(
-                '\$${widget.food.price}',
+                '৳${widget.food.price}',
                 style: TextStyle(fontSize: 22, color: Colors.redAccent),
               ),
               SizedBox(height: 10),
@@ -186,12 +188,14 @@ class _FoodDetailsScreenState extends State<FoodDetailsScreen> {
 
                     int quantity = int.tryParse(_quantityController.text) ?? 0;
                     await sendOrderData(quantity);
+
                     AwesomeNotifications().createNotification(
                       content: NotificationContent(
                           id: 1,
                           channelKey: "basic_channel",
-                          title: "Order Successful",
-                          body: 'YUMM,You have ordered $quantity $foodName'),
+                          title: "Your order has been successfully placed!",
+                          body: 'YUMM,You have ordered $quantity $foodName from $restaurantName.',
+                      ),
                     );
                   }
                       : null,
