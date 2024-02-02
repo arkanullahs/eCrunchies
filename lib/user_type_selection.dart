@@ -1,3 +1,5 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:eCrunchies/notification_controller.dart';
 import 'package:flutter/material.dart';
 import 'signup_screen.dart' as signup;
 import 'user_type.dart';
@@ -11,10 +13,12 @@ class UserTypeSelection extends StatefulWidget {
 class _UserTypeSelectionState extends State<UserTypeSelection> {
   int _currentIndex = 0;
 
+
   @override
+
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFF9EBDC),
+      //backgroundColor: Color(0xFFF9EBDC),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -38,8 +42,8 @@ class _UserTypeSelectionState extends State<UserTypeSelection> {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: Color(0xfff47a10), // Reddish color
-                    textStyle: TextStyle(fontSize: 18, color: Colors.white),
+                    //primary: Color(0xfff47a10), // Reddish color
+                    textStyle: TextStyle(fontSize: 18, /*color: Colors.white*/),
                     padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15),
@@ -58,7 +62,7 @@ class _UserTypeSelectionState extends State<UserTypeSelection> {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: Color(0xfff47a10), // Reddish color
+                    //primary: Color(0xfff47a10), // Reddish color
                     textStyle: TextStyle(fontSize: 18, color: Colors.white),
                     padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                     shape: RoundedRectangleBorder(
@@ -75,11 +79,22 @@ class _UserTypeSelectionState extends State<UserTypeSelection> {
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
+        selectedItemColor: Colors.deepOrange,
+        selectedIconTheme: IconThemeData(
+          color: Colors.deepOrange,
+          size: 30.0, // Adjust the size according to your preference
+        ),
+        selectedLabelStyle: TextStyle(
+          color: Colors.deepOrange,
+        ),
+        unselectedItemColor: Colors.grey,
+        showUnselectedLabels: true,
         currentIndex: _currentIndex,
         onTap: (index) {
           setState(() {
             _currentIndex = index;
             if (_currentIndex == 1) {
+              selectedItemColor: Colors.deepOrange;
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => LoginScreen(userType: '')),
@@ -87,11 +102,12 @@ class _UserTypeSelectionState extends State<UserTypeSelection> {
             }
           });
         },
-        backgroundColor: Color(0xFFF9EBDC),
+        //backgroundColor: Color(0xFFF9EBDC),
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.person_add_alt_1_outlined),
             label: 'Sign Up',
+
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.login_outlined),

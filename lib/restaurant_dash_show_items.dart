@@ -54,7 +54,7 @@ class ShowItems extends StatelessWidget {
                         borderRadius: BorderRadius.zero,
                       ),
                       child: ListTile(
-                        contentPadding: EdgeInsets.all(5),
+                        contentPadding: EdgeInsets.all(3),
                         leading: FadeInImage(
                           placeholder: AssetImage('assets/placeholder.png'), // Replace with your placeholder image
                           image: NetworkImage(
@@ -70,7 +70,7 @@ class ShowItems extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
-                            fontStyle: FontStyle.italic,
+                            //fontStyle: FontStyle.italic,
                           ),
                         ),
                         subtitle: Column(
@@ -79,7 +79,7 @@ class ShowItems extends StatelessWidget {
                             SizedBox(height: 3),
                             Text(
                               items[index]['description'],
-                              style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic),
+                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400),
                               maxLines: 3,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -132,7 +132,7 @@ class ShowItems extends StatelessWidget {
                                   ),
                                 );
                               },
-                              icon: Icon(Icons.edit),
+                              icon: Icon(Icons.mode_edit_outlined),
                               color: Colors.grey,
                             ),
                           ],
@@ -140,7 +140,7 @@ class ShowItems extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Divider(height: 5, thickness: 0), // Divider between items
+                  Divider(height: 0, thickness: 1), // Divider between items
                 ],
               );
             },

@@ -163,7 +163,7 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
                       toastLength: Toast.LENGTH_SHORT,
                       gravity: ToastGravity.BOTTOM,
                       timeInSecForIosWeb: 1,
-                      backgroundColor: Colors.green,
+                      //backgroundColor: Colors.green,
                       textColor: Colors.white,
                       fontSize: 16.0,
                     );
@@ -172,8 +172,9 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
                   },
                   child: Text('Add', style: TextStyle(fontSize: 16)),
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.deepOrangeAccent,
-                    elevation: 5,
+                    //primary: Colors.deepOrangeAccent,
+                    backgroundColor: Colors.orange[300],
+                    elevation: 3,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -327,7 +328,7 @@ class _RestaurantDashboardState extends State<RestaurantDashboard> {
                                 child: Text(
                                   'Cancel',
                                   style: TextStyle(
-                                    color: Colors.deepOrangeAccent,
+                                    //color: Colors.deepOrangeAccent,
                                     fontSize: 16,
                                   ),
                                 ),

@@ -95,7 +95,7 @@ class _SignupScreenState extends State<SignupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFF9EBDC),
+      //backgroundColor: Color(0xFFF9EBDC),
       appBar: AppBar(
         title: Text('Sign Up'),
       ),
@@ -187,7 +187,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     );
                   },
                   style: TextButton.styleFrom(
-                    primary: Colors.black,
+                    //primary: Colors.black,
                     textStyle: TextStyle(fontSize: 16),
                   ),
                   child: Text('Already have an account? Login'),

@@ -224,7 +224,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFF9EBDC),
+      //backgroundColor: Color(0xFFF9EBDC),
       appBar: AppBar(
         title: Text('Login'),
       ),
@@ -267,7 +267,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                 GestureDetector(
                   onTap: _isPasswordIncorrect || _isLoggingIn ? null : _login,
                   child: Container(
-                    width: double.infinity,
+                    width: 130,
                     height: 50,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(_animation.value),
@@ -275,11 +275,12 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                           ? Colors.green
                           : _isPasswordIncorrect
                           ? Colors.red
-                          : (_isPasswordInputting ? Theme.of(context).primaryColor : Colors.grey),
+                          : (_isPasswordInputting ? Theme.of(context).primaryColor : Colors.grey[400]),
                     ),
                     child: Center(
                       child: Stack(
                         alignment: Alignment.center,
+                        fit: StackFit.passthrough,
                         children: [
                           if (!_isLoggingIn) // Only show arrow when not logging in
                             _isLoginSuccessful
@@ -289,6 +290,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                                 : Icon(Icons.arrow_forward, color: Colors.white),
                           if (_isLoggingIn)
                             CircularProgressIndicator(
+                              strokeAlign: BorderSide.strokeAlignCenter,
                               valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                             ),
                         ],

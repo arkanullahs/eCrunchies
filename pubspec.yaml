@@ -53,6 +53,7 @@ dependencies:
   loading_overlay:
   fluttertoast:
   flutter_launcher_icons: ^0.13.1
+  awesome_notifications: ^0.9.2
 
 dev_dependencies:
   flutter_test:
