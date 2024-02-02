@@ -15,15 +15,21 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  await AwesomeNotifications().initialize(null,
+
+  await AwesomeNotifications().initialize('resource://drawable/ic_stat_food_delivery_logo_recovered',
       [
         NotificationChannel(
           channelGroupKey: "basic_channel_group",
             channelKey: "basic_channel",
             channelName: "basic_notifications",
             channelDescription: "basic channel",
+          importance: NotificationImportance.High,
+          ledColor: Colors.white,
+          channelShowBadge: true,
+
         )
       ],
+
     channelGroups: [
       NotificationChannelGroup(channelGroupKey: "basic_channel_group", channelGroupName: "basic_group")
     ]
