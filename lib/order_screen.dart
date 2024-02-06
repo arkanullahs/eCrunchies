@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:image_picker/image_picker.dart';
 import 'food_details_screen.dart';
 import 'food_items_screen.dart';
 import 'discover_screen.dart';
 import 'foods_screen.dart';
 import 'restaurant_menu_screen.dart';
 import 'order_chat_screen.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'dart:io';
 
 class OrderScreen extends StatefulWidget {
   @override
@@ -15,7 +18,30 @@ class OrderScreen extends StatefulWidget {
 
 class _OrderScreenState extends State<OrderScreen> {
   String searchQuery = '';
+  //String? userName = '';
+  String? userEmail = '';
 
+  @override
+  void initState() {
+    super.initState();
+    //fetchUserName();
+    fetchUserEmail();
+  }
+
+  void fetchUserEmail() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        String? email = user.email;
+        setState(() {
+          userEmail = email;
+        });
+      }
+    } catch (error) {
+      print('Error fetching user email: $error');
+    }
+  }
+/////////////////////////
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,7 +77,65 @@ class _OrderScreenState extends State<OrderScreen> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
+      drawer: Drawer(
+        child: Container(
+          color: Colors.blueGrey[500],
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: <Widget>[
+              DrawerHeader(
+                decoration: BoxDecoration(
+                  color: Colors.blueGrey[800],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'User Profile',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    ListTile(
+                      leading: Icon(
+                        Icons.account_circle,
+                        color: Colors.white,
+                        size: 40,
+                      ),
+                      title: Text(
+                        userEmail ?? 'Email Address',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              ListTile(
+                title: Text(
+                  'Upload Profile Picture',
+                  style: TextStyle(color: Colors.white),
+                ),
+                onTap: () async {
+                  await _uploadProfilePicture();
+                },
+              ),
+            ],
+          ),
+        ),
+        //],
+      ),
+   // ),
+    //),
+
+    body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -70,21 +154,62 @@ class _OrderScreenState extends State<OrderScreen> {
             ),
             FoodItemsScreen(),
             DiscoverScreen(),
+            SizedBox(height: 20),
+
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          _showMessages();
+          _showMessages(context);
         },
         tooltip: 'Show Messages',
-        child:
-        Icon(Icons.message),
+        child: Icon(Icons.message),
       ),
     );
   }
+  Future<void> _uploadProfilePicture() async {
+    try {
+      final picker = ImagePicker();
+      final pickedFile = await picker.getImage(source: ImageSource.gallery);
+      if (pickedFile != null) {
+        File imageFile = File(pickedFile.path);
 
-  void _showMessages() async {
+        // Upload image to Firebase Storage
+        Reference ref = FirebaseStorage.instance
+            .ref()
+            .child('profile_pictures')
+            .child('${FirebaseAuth.instance.currentUser!.uid}.jpg');
+        UploadTask uploadTask = ref.putFile(imageFile);
+        TaskSnapshot taskSnapshot = await uploadTask;
+
+        // Get the download URL of the uploaded image
+        String downloadUrl = await taskSnapshot.ref.getDownloadURL();
+
+        // Save the download URL in Firestore
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .update({'profile_picture': downloadUrl});
+
+        // Update the UI to display the profile picture
+        setState(() {
+          // Update the profile picture URL
+          // This will trigger the UI to update
+          // and show the newly uploaded picture
+          // You can also navigate to a new page where the user can see their updated profile
+          // For simplicity, I'm not implementing navigation here
+          // You can add it as per your application flow
+        });
+      }
+    } catch (error) {
+      print('Error uploading profile picture: $error');
+    }
+  }
+}
+
+//void _showMessages() async {
+void _showMessages(BuildContext context) async {
     String currentUserEmail = FirebaseAuth.instance.currentUser?.email ?? '';
     CollectionReference orderChatsCollection =
     FirebaseFirestore.instance.collection('order_chats');
@@ -110,9 +235,12 @@ class _OrderScreenState extends State<OrderScreen> {
             title: Text('Select an Order'),
             content: Container(
               width: double.maxFinite,
+              //height: MediaQuery.of(context).size.height * 0.5,
+
               child: ListView.builder(
                 itemCount: orderIds.length,
-                itemBuilder: (context, index) {
+          //itemBuilder: (BuildContext context, int index) {
+          itemBuilder: (context, index) {
                   String orderId = orderIds[index];
 
                   return Column(
@@ -127,7 +255,7 @@ class _OrderScreenState extends State<OrderScreen> {
                             context,
                             MaterialPageRoute(
                               builder: (context) => OrderChatScreen(
-                                restaurantId: '', // Provide the restaurant ID here
+                                restaurantId: '', //  the restaurant ID here
                                 orderId: orderId,
                               ),
                             ),
@@ -166,12 +294,7 @@ class _OrderScreenState extends State<OrderScreen> {
       print('Error fetching order chats: $error');
     }
   }
-
-
-
-
-
-}
+//}
 
 class RestaurantSearchDelegate extends SearchDelegate<String> {
   @override
