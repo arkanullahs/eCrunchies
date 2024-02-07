@@ -195,6 +195,7 @@ class _FoodDetailsScreenState extends State<FoodDetailsScreen> {
                           channelKey: "basic_channel",
                           title: "Your order has been successfully placed!",
                           body: 'YUMM,You have ordered $quantity $foodName from $restaurantName.',
+                        notificationLayout: NotificationLayout.BigText,
                       ),
                     );
                   }
