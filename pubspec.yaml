@@ -54,6 +54,7 @@ dependencies:
   fluttertoast:
   flutter_launcher_icons: ^0.13.1
   awesome_notifications: ^0.9.2
+  chewie:
 
 dev_dependencies:
   flutter_test:
@@ -79,6 +80,7 @@ flutter:
     - assets/arkanullah_saad.jpg
     - assets/nadia_yeasmin.jpg
     - assets/khadiza_khanom_liza.jpg
+    - assets/welcome_video.mp4
 
 
   # The following line ensures that the Material Icons font is

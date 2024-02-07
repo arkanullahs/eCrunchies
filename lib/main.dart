@@ -8,6 +8,7 @@ import 'restaurant_dash.dart';
 import 'user_type_selection.dart';
 import 'signup_screen.dart';
 import 'notification_controller.dart';
+import 'welcome_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -75,7 +76,8 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       initialRoute: '/',
       routes: {
-        '/': (context) => UserTypeSelection(),
+        '/': (context) => WelcomeScreen(),
+        //'/': (context) => UserTypeSelection(),
         '/home': (context) => OrderScreen(),
         '/restaurantDashboard': (context) => RestaurantDashboard(),
         '/orderScreen': (context) => OrderScreen(),
