@@ -76,6 +76,9 @@ flutter:
     - assets/facebook_logo.png
     - assets/google_logo.png
     - assets/placeholder.png
+    - assets/arkanullah_saad.jpg
+    - assets/nadia_yeasmin.jpg
+    - assets/khadiza_khanom_liza.jpg
 
 
   # The following line ensures that the Material Icons font is

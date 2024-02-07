@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:image_picker/image_picker.dart';
 import 'food_details_screen.dart';
 import 'food_items_screen.dart';
 import 'discover_screen.dart';
 import 'foods_screen.dart';
 import 'restaurant_menu_screen.dart';
 import 'order_chat_screen.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'dart:io';
 
 class OrderScreen extends StatefulWidget {
   @override
@@ -15,7 +18,33 @@ class OrderScreen extends StatefulWidget {
 
 class _OrderScreenState extends State<OrderScreen> {
   String searchQuery = '';
+  //String? userName = '';
+  String? userEmail = '';
+  String? profilePictureUrl;
 
+  @override
+  void initState() {
+    super.initState();
+    //fetchUserName();
+    fetchUserEmail();
+  }
+
+
+  void fetchUserEmail() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        String? email = user.email;
+        setState(() {
+          userEmail = email;
+        });
+      }
+    } catch (error) {
+      print('Error fetching user email: $error');
+    }
+  }
+
+/////////////////////////
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,7 +80,111 @@ class _OrderScreenState extends State<OrderScreen> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
+
+      drawer: Drawer(
+        child: Container(
+          color: Colors.orange[100],
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: <Widget>[
+              DrawerHeader(
+                decoration: BoxDecoration(
+                  color: Colors.orange[300],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'User Profile',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    ListTile(
+                      leading: profilePictureUrl != null
+                          ? Image.network(
+                        profilePictureUrl!,
+                        width: 50,
+                        height: 50,
+                        fit: BoxFit.cover,
+                      )
+                          : SizedBox(
+                        width: 50,
+                        height: 50,
+                        child: Placeholder(),
+                      ),
+
+                      title: Text(
+                        userEmail ?? 'Email Address',
+                        style: TextStyle(
+                          color: Colors.black54,
+                          fontSize: 20,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              ListTile(
+                title: Text(
+                  'View Profile',
+                  style: TextStyle(color: Colors.black),
+                ),
+                leading: Icon(
+                  Icons.account_circle,
+                  color: Colors.black,
+                ),
+                onTap: () async {
+                  // Navigate to the profile view screen
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ProfileViewScreen()),
+                  );
+                },
+              ),
+
+              ListTile(
+                title: Text(
+                  'Upload Profile Picture',
+                  style: TextStyle(color: Colors.black),
+                ),
+                leading: Icon(
+                  Icons.upload_rounded,
+                  color: Colors.black,
+                ),
+                onTap: () async {
+                  await _uploadProfilePicture();
+                },
+              ),
+              ListTile(
+                title: Text(
+                  'About Us',
+                  style: TextStyle(color: Colors.black),
+                ),
+                leading: Icon(
+                  Icons.info,
+                  color: Colors.black,
+                ),
+                onTap: () async {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => AboutUsScreen()),
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+        //],
+      ),
+   // ),
+    //),
+
+    body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -70,21 +203,62 @@ class _OrderScreenState extends State<OrderScreen> {
             ),
             FoodItemsScreen(),
             DiscoverScreen(),
+            SizedBox(height: 20),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          _showMessages();
+          _showMessages(context);
         },
         tooltip: 'Show Messages',
-        child:
-        Icon(Icons.message),
+        child: Icon(Icons.message),
       ),
     );
   }
+  Future<void> _uploadProfilePicture() async {
+    try {
+      final picker = ImagePicker();
+      final pickedFile = await picker.getImage(source: ImageSource.gallery);
+      if (pickedFile != null) {
+        File imageFile = File(pickedFile.path);
 
-  void _showMessages() async {
+        // Upload image to Firebase Storage
+        Reference ref = FirebaseStorage.instance
+            .ref()
+            .child('profile_pictures')
+            .child('${FirebaseAuth.instance.currentUser!.uid}.jpg');
+        UploadTask uploadTask = ref.putFile(imageFile);
+        TaskSnapshot taskSnapshot = await uploadTask;
+
+        // Get the download URL of the uploaded image
+        String downloadUrl = await taskSnapshot.ref.getDownloadURL();
+
+        // Save the download URL in Firestore
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .update({'profile_picture': downloadUrl});
+
+        // Update the UI to display the profile picture
+        setState(() {
+          // Update the profile picture URL with the newly uploaded picture's download URL
+          profilePictureUrl = downloadUrl;
+          // This will trigger the UI to update
+          // and show the newly uploaded picture
+          // You can also navigate to a new page where the user can see their updated profile
+          // For simplicity, I'm not implementing navigation here
+          // You can add it as per your application flow
+        });
+      }
+    } catch (error) {
+      print('Error uploading profile picture: $error');
+    }
+  }
+}
+
+//void _showMessages() async {
+void _showMessages(BuildContext context) async {
     String currentUserEmail = FirebaseAuth.instance.currentUser?.email ?? '';
     CollectionReference orderChatsCollection =
     FirebaseFirestore.instance.collection('order_chats');
@@ -110,9 +284,12 @@ class _OrderScreenState extends State<OrderScreen> {
             title: Text('Select an Order'),
             content: Container(
               width: double.maxFinite,
+              //height: MediaQuery.of(context).size.height * 0.5,
+
               child: ListView.builder(
                 itemCount: orderIds.length,
-                itemBuilder: (context, index) {
+          //itemBuilder: (BuildContext context, int index) {
+          itemBuilder: (context, index) {
                   String orderId = orderIds[index];
 
                   return Column(
@@ -127,7 +304,7 @@ class _OrderScreenState extends State<OrderScreen> {
                             context,
                             MaterialPageRoute(
                               builder: (context) => OrderChatScreen(
-                                restaurantId: '', // Provide the restaurant ID here
+                                restaurantId: '', //  the restaurant ID here
                                 orderId: orderId,
                               ),
                             ),
@@ -166,12 +343,187 @@ class _OrderScreenState extends State<OrderScreen> {
       print('Error fetching order chats: $error');
     }
   }
-
-
-
-
-
+class ProfileViewScreen extends StatefulWidget {
+  @override
+  _ProfileViewScreenState createState() => _ProfileViewScreenState();
 }
+class _ProfileViewScreenState extends State<ProfileViewScreen> {
+  TextEditingController nameController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController privacyController = TextEditingController();
+  TextEditingController securityController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+
+  bool isPrivate = false;
+  bool twoFactorAuth = false;
+ // String aboutUs = '';
+
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('View Profile'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: 20),
+            Text('Change Email:'),
+            TextField(
+              controller: emailController,
+              decoration: InputDecoration(
+                hintText: 'Enter your new email',
+              ),
+            ),
+            SizedBox(height: 20),
+            Text('Change Password:'),
+            TextField(
+              controller: passwordController,
+              obscureText: true,
+              decoration: InputDecoration(
+                hintText: 'Enter your new password',
+              ),
+            ),
+            SizedBox(height: 20),
+            Text('Privacy:'),
+            Switch(
+              value: isPrivate,
+              onChanged: (value) {
+                setState(() {
+                  isPrivate = value;
+                });
+              },
+            ),
+            SizedBox(height: 20),
+            Text('Two-factor Authentication:'),
+            Switch(
+              value: twoFactorAuth,
+              onChanged: (value) {
+                setState(() {
+                  twoFactorAuth = value;
+                });
+              },
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () async {
+                await updateProfile();
+              },
+              child: Text('Done'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> updateProfile() async {
+    try {
+      if (emailController.text.isNotEmpty) {
+        await FirebaseAuth.instance.currentUser?.updateEmail(emailController.text);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Email updated successfully.'),
+          ),
+        );
+      }
+
+      if (passwordController.text.isNotEmpty) {
+        await FirebaseAuth.instance.currentUser?.updatePassword(passwordController.text);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Password updated successfully.'),
+          ),
+        );
+      }
+
+      if (isPrivate) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Privacy settings updated successfully.'),
+          ),
+        );
+      }
+    } catch (error) {
+      print('Error updating profile: $error');
+    }
+  }
+}
+class AboutUsScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('About Us'),
+      ),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'App Team Members:',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+            ),
+            ListTile(
+              leading: Image.asset('assets/nadia_yeasmin.jpg'),
+              title: Text('Nadia Yeasmin'),
+              subtitle: Text('Developer'),
+            ),
+            ListTile(
+              leading: Image.asset('assets/arkanullah_saad.jpg'),
+              title: Text('Arkanullah Saad'),
+              subtitle: Text('Developer'),
+            ),
+            ListTile(
+              leading: Image.asset('assets/khadiza_khanom_liza.jpg'),
+              title: Text('Khadiza khanom liza'),
+              subtitle: Text('Developer'),
+            ),
+            Divider(),
+            Text(
+              'Description:',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+            ),
+            // Display description using Text widget
+            Text(
+              'About our eCrunchies: The food delivery application aims to revolutionize the way users interact with restaurant services. It will provide a seamless platform where users can explore diverse culinary options, place orders effortlessly . Simultaneously, it offers restaurant owners a streamlined interface to manage incoming orders efficiently.',
+              style: TextStyle(fontSize: 16),
+            ),
+
+            Divider(),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Contact Email:',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                  ),
+                  // Display contact emails using Text widgets
+                  Text(
+                    'nadiasupti8@gmail.com',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  Text(
+                    'arkanullahs@gmail.com',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  Text(
+                    'IK221201@gmail.com',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                ],
+              )
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 
 class RestaurantSearchDelegate extends SearchDelegate<String> {
   @override
@@ -206,6 +558,7 @@ class RestaurantSearchDelegate extends SearchDelegate<String> {
     return SearchResults(searchQuery: query);
   }
 }
+
 
 class SearchResults extends StatelessWidget {
   final String searchQuery;
@@ -287,3 +640,4 @@ class RestaurantCard extends StatelessWidget {
     );
   }
 }
+
