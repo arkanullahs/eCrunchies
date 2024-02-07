@@ -13,7 +13,7 @@ class FoodsScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            height: 200,
+            height: 170,
             child: StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance.collection('foods').snapshots(),
               builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
