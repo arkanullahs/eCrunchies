@@ -20,6 +20,8 @@ class _OrderScreenState extends State<OrderScreen> {
   String searchQuery = '';
   //String? userName = '';
   String? userEmail = '';
+  String? profilePictureUrl;
+
 
   @override
   void initState() {
@@ -77,6 +79,7 @@ class _OrderScreenState extends State<OrderScreen> {
           ),
         ],
       ),
+
       drawer: Drawer(
         child: Container(
           color: Colors.blueGrey[500],
@@ -101,11 +104,19 @@ class _OrderScreenState extends State<OrderScreen> {
                     ),
                     SizedBox(height: 10),
                     ListTile(
-                      leading: Icon(
-                        Icons.account_circle,
-                        color: Colors.white,
-                        size: 40,
+                      leading: profilePictureUrl != null // Use profilePictureUrl here
+                          ? Image.network(
+                        profilePictureUrl!,
+                        width: 50,
+                        height: 50,
+                        fit: BoxFit.cover,
+                      )
+                          : SizedBox(
+                        width: 50,
+                        height: 50,
+                        child: Placeholder(),
                       ),
+
                       title: Text(
                         userEmail ?? 'Email Address',
                         style: TextStyle(
@@ -117,11 +128,53 @@ class _OrderScreenState extends State<OrderScreen> {
                   ],
                 ),
               ),
+              /*
+              ListTile(
+                leading: profilePictureUrl != null
+                    ? Image.network(
+                  profilePictureUrl!,
+                  width: 50,
+                  height: 50,
+                  fit: BoxFit.cover,
+                )
+                    : Placeholder(
+                  width: 50,
+                  height: 50,
+                ),
+                title: Text(
+                  userEmail ?? 'Email Address',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+*/
+              ListTile(
+                title: Text(
+                  'View Profile',
+                  style: TextStyle(color: Colors.white),
+                ),
+                leading: Icon(
+                  Icons.account_circle,
+                  color: Colors.white,
+                ),
+                onTap: () async {
+                  // Add functionality to view profile
+                },
+              ),
 
               ListTile(
                 title: Text(
                   'Upload Profile Picture',
                   style: TextStyle(color: Colors.white),
+                ),
+                leading: Icon(
+                  Icons.account_circle,
+                  color: Colors.white,
                 ),
                 onTap: () async {
                   await _uploadProfilePicture();
@@ -194,7 +247,8 @@ class _OrderScreenState extends State<OrderScreen> {
 
         // Update the UI to display the profile picture
         setState(() {
-          // Update the profile picture URL
+          // Update the profile picture URL with the newly uploaded picture's download URL
+          profilePictureUrl = downloadUrl;
           // This will trigger the UI to update
           // and show the newly uploaded picture
           // You can also navigate to a new page where the user can see their updated profile
