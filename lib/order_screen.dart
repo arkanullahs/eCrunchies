@@ -83,13 +83,13 @@ class _OrderScreenState extends State<OrderScreen> {
 
       drawer: Drawer(
         child: Container(
-          color: Colors.blueGrey[500],
+          color: Colors.orange[100],
           child: ListView(
             padding: EdgeInsets.zero,
             children: <Widget>[
               DrawerHeader(
                 decoration: BoxDecoration(
-                  color: Colors.blueGrey[800],
+                  color: Colors.orange[300],
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -98,14 +98,14 @@ class _OrderScreenState extends State<OrderScreen> {
                     Text(
                       'User Profile',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: Colors.black,
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     SizedBox(height: 10),
                     ListTile(
-                      leading: profilePictureUrl != null // Use profilePictureUrl here
+                      leading: profilePictureUrl != null
                           ? Image.network(
                         profilePictureUrl!,
                         width: 50,
@@ -121,7 +121,7 @@ class _OrderScreenState extends State<OrderScreen> {
                       title: Text(
                         userEmail ?? 'Email Address',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: Colors.black54,
                           fontSize: 20,
                         ),
                       ),
@@ -132,11 +132,11 @@ class _OrderScreenState extends State<OrderScreen> {
               ListTile(
                 title: Text(
                   'View Profile',
-                  style: TextStyle(color: Colors.white),
+                  style: TextStyle(color: Colors.black),
                 ),
                 leading: Icon(
                   Icons.account_circle,
-                  color: Colors.white,
+                  color: Colors.black,
                 ),
                 onTap: () async {
                   // Navigate to the profile view screen
@@ -150,11 +150,11 @@ class _OrderScreenState extends State<OrderScreen> {
               ListTile(
                 title: Text(
                   'Upload Profile Picture',
-                  style: TextStyle(color: Colors.white),
+                  style: TextStyle(color: Colors.black),
                 ),
                 leading: Icon(
-                  Icons.account_circle,
-                  color: Colors.white,
+                  Icons.upload_rounded,
+                  color: Colors.black,
                 ),
                 onTap: () async {
                   await _uploadProfilePicture();
@@ -163,11 +163,11 @@ class _OrderScreenState extends State<OrderScreen> {
               ListTile(
                 title: Text(
                   'About Us',
-                  style: TextStyle(color: Colors.white),
+                  style: TextStyle(color: Colors.black),
                 ),
                 leading: Icon(
                   Icons.info,
-                  color: Colors.white,
+                  color: Colors.black,
                 ),
                 onTap: () async {
                   Navigator.push(
