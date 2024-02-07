@@ -16,7 +16,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  await AwesomeNotifications().initialize('resource://drawable/ic_stat_food_delivery_logo_recovered',
+  await AwesomeNotifications().initialize('resource://drawable/ic_layer_4',
       [
         NotificationChannel(
           channelGroupKey: "basic_channel_group",
