@@ -31,7 +31,7 @@ class FoodItemsScreen extends StatelessWidget {
                 final List<DocumentSnapshot> documents = snapshot.data!.docs;
 
                 // Display only the first 4 items
-                final List<DocumentSnapshot> displayedDocuments = documents.take(8).toList();
+                final List<DocumentSnapshot> displayedDocuments = documents.take(4).toList();
 
                 return ListView.builder(
                   scrollDirection: Axis.horizontal,

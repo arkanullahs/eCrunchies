@@ -106,18 +106,15 @@ class _OrderScreenState extends State<OrderScreen> {
                     SizedBox(height: 10),
                     ListTile(
                       leading: profilePictureUrl != null
-                          ? Image.network(
-                        profilePictureUrl!,
-                        width: 50,
-                        height: 50,
-                        fit: BoxFit.cover,
+                          ? CircleAvatar(
+                        radius: 25, // Adjust the radius as needed
+                        backgroundImage: NetworkImage(profilePictureUrl!),
                       )
                           : SizedBox(
                         width: 50,
                         height: 50,
                         child: Placeholder(),
                       ),
-
                       title: Text(
                         userEmail ?? 'Email Address',
                         style: TextStyle(
@@ -125,7 +122,8 @@ class _OrderScreenState extends State<OrderScreen> {
                           fontSize: 20,
                         ),
                       ),
-                    ),
+                    )
+
                   ],
                 ),
               ),
@@ -461,64 +459,85 @@ class AboutUsScreen extends StatelessWidget {
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               'App Team Members:',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
             ),
             ListTile(
-              leading: Image.asset('assets/nadia_yeasmin.jpg'),
+              leading: CircleAvatar(
+                backgroundImage: AssetImage('assets/nadia_yeasmin.jpg'),
+              ),
               title: Text('Nadia Yeasmin'),
               subtitle: Text('Developer'),
             ),
             ListTile(
-              leading: Image.asset('assets/arkanullah_saad.jpg'),
+              leading: CircleAvatar(
+                backgroundImage: AssetImage('assets/arkanullah_saad.jpg'),
+              ),
               title: Text('Arkanullah Saad'),
               subtitle: Text('Developer'),
             ),
             ListTile(
-              leading: Image.asset('assets/khadiza_khanom_liza.jpg'),
-              title: Text('Khadiza khanom liza'),
+              leading: CircleAvatar(
+                backgroundImage: AssetImage('assets/khadiza_khanom_liza.jpg'),
+              ),
+              title: Text('Khadiza Khanom Liza'),
               subtitle: Text('Developer'),
             ),
-            Divider(),
+            SizedBox(height: 20),
             Text(
               'Description:',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
             ),
-            // Display description using Text widget
-            Text(
-              'About our eCrunchies: The food delivery application aims to revolutionize the way users interact with restaurant services. It will provide a seamless platform where users can explore diverse culinary options, place orders effortlessly . Simultaneously, it offers restaurant owners a streamlined interface to manage incoming orders efficiently.',
-              style: TextStyle(fontSize: 16),
+            SizedBox(height: 10),
+            Container(
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.grey[200], // Background color
+                borderRadius: BorderRadius.circular(10), // Rounded corners
+              ),
+              child: Text(
+                'About our eCrunchies: The food delivery application aims to revolutionize the way users interact with restaurant services. It will provide a seamless platform where users can explore diverse culinary options, place orders effortlessly. Simultaneously, it offers restaurant owners a streamlined interface to manage incoming orders efficiently.',
+                style: TextStyle(fontSize: 16, color: Colors.black),
+              ),
             ),
 
-            Divider(),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Contact Email:',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-                  ),
-                  // Display contact emails using Text widgets
-                  Text(
+            SizedBox(height: 20),
+            Text(
+              'Contact Email:',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+            ),
+            SizedBox(height: 10),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ListTile(
+                  leading: Icon(Icons.alternate_email), // Icon for email
+                  title: Text(
                     'nadiasupti8@gmail.com',
                     style: TextStyle(fontSize: 16),
                   ),
-                  Text(
+                ),
+                ListTile(
+                  leading: Icon(Icons.alternate_email), // Icon for email
+                  title: Text(
                     'arkanullahs@gmail.com',
                     style: TextStyle(fontSize: 16),
                   ),
-                  Text(
+                ),
+                ListTile(
+                  leading: Icon(Icons.alternate_email), // Icon for email
+                  title: Text(
                     'IK221201@gmail.com',
                     style: TextStyle(fontSize: 16),
                   ),
-                ],
-              )
+                ),
+              ],
+            ),
           ],
-        ),
+        )
       ),
     );
   }
