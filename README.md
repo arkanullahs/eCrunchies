@@ -31,10 +31,6 @@ git clone https://github.com/arkanullahs/eCrunchies.git
 flutter run
 
 
-## Contribution
-
-Contributions to improve features, fix bugs, or optimize the app are welcome! Fork the repository, make changes, and submit a pull request.
-
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
